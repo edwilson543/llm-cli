@@ -1,0 +1,6 @@
+TODO.txt
+.env*
+
+.idea
+.DS_Store
+*.egg*
