@@ -1,5 +1,7 @@
 import dataclasses
 
+from collections.abc import AsyncGenerator
+
 import anthropic
 
 from anthropic import types as anthropic_types
@@ -37,19 +39,21 @@ class ClaudeClient(_base.LLMClient):
             raise AnthropicAPIKeyNotSet from exc
 
         self._client = anthropic.Client(api_key=api_key)
+        self._async_client = anthropic.AsyncClient(api_key=api_key)
         self._model = "claude-3-5-sonnet-20241022"
         self._max_tokens = 1024
 
+        self._system_prompt = "Please be as succinct as possible in your answer. "
+
     def get_response(self, *, user_prompt: str, character: str | None = None) -> str:
-        system = "Please be as succinct as possible in your answer. "
         if character:
-            system += f"Please assume the persona of {character}."
+            self._add_character_to_system_prompt(character=character)
 
         try:
             message = self._client.messages.create(
                 model=self._model,
                 max_tokens=self._max_tokens,
-                system=system,
+                system=self._system_prompt,
                 messages=[{"role": "user", "content": user_prompt}],
             )
         except anthropic.APIStatusError as exc:
@@ -60,3 +64,23 @@ class ClaudeClient(_base.LLMClient):
             raise AnthropicResponseTypeError(type=str(type(response)))
 
         return response.text
+
+    async def get_response_async(
+        self, *, user_prompt: str, character: str | None = None
+    ) -> AsyncGenerator[str, None]:
+        if character:
+            self._add_character_to_system_prompt(character=character)
+
+        async with self._async_client.messages.stream(
+            model=self._model,
+            max_tokens=self._max_tokens,
+            system=self._system_prompt,
+            messages=[{"role": "user", "content": user_prompt}],
+        ) as stream:
+            async for text in stream.text_stream:
+                yield text
+
+        await stream.get_final_message()
+
+    def _add_character_to_system_prompt(self, character: str) -> None:
+        self._system_prompt += f"Please assume the persona of {character}."

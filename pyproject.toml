@@ -24,8 +24,8 @@ dependencies = [
 ]
 
 [project.scripts]
-question = "llm_cli.commands.question:ask_question"
-q = "llm_cli.commands.question:ask_question"
+question = "llm_cli.commands.question:main"
+q = "llm_cli.commands.question:main"
 
 # ----------
 # Tooling
