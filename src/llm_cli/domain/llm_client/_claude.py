@@ -2,6 +2,8 @@ import dataclasses
 
 import anthropic
 
+from anthropic import types as anthropic_types
+
 from llm_cli import env
 from llm_cli.domain.llm_client import _base
 
@@ -20,6 +22,11 @@ class AnthropicAPIError(_base.LLMClientError):
         return f"Unable to get a response. The Anthropic API responded with status code: {self.status_code}."
 
 
+@dataclasses.dataclass
+class AnthropicResponseTypeError(_base.LLMClientError):
+    type: str
+
+
 class ClaudeClient(_base.LLMClient):
     def __init__(self) -> None:
         super().__init__()
@@ -33,14 +40,23 @@ class ClaudeClient(_base.LLMClient):
         self._model = "claude-3-5-sonnet-20241022"
         self._max_tokens = 1024
 
-    def get_response(self, *, user_prompt: str) -> str:
+    def get_response(self, *, user_prompt: str, character: str | None = None) -> str:
+        system = "Please be as succinct as possible in your answer. "
+        if character:
+            system += f"Please assume the persona of {character}."
+
         try:
             message = self._client.messages.create(
                 model=self._model,
                 max_tokens=self._max_tokens,
+                system=system,
                 messages=[{"role": "user", "content": user_prompt}],
             )
         except anthropic.APIStatusError as exc:
             raise AnthropicAPIError(status_code=exc.status_code)
 
-        return str(message.content[0].text)
+        response = message.content[0]
+        if not isinstance(response, anthropic_types.TextBlock):
+            raise AnthropicResponseTypeError(type=str(type(response)))
+
+        return response.text

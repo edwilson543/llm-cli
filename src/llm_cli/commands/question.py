@@ -8,6 +8,7 @@ from llm_cli.domain import llm_client
 @dataclasses.dataclass
 class CommandArgs:
     prompt: str
+    character: str | None
     model: llm_client.Model
 
 
@@ -18,12 +19,14 @@ def ask_question(*, arguments: CommandArgs | None = None):
     client = llm_client.get_llm_client(model=arguments.model)
 
     try:
-        response_message = client.get_response(user_prompt=arguments.prompt)
+        response_message = client.get_response(
+            user_prompt=arguments.prompt, character=arguments.character
+        )
     except llm_client.LLMClientError as exc:
         print(str(exc))
         raise
 
-    print("\n", response_message)
+    print("\n", response_message, "\n")
 
 
 def _extract_args_from_cli(args: list[str]) -> CommandArgs:
@@ -33,6 +36,13 @@ def _extract_args_from_cli(args: list[str]) -> CommandArgs:
         "prompt",
         type=str,
         help="The user prompt for the LLM.",
+    )
+    parser.add_argument(
+        "-c",
+        "--character",
+        type=str,
+        required=False,
+        help="The character the LLM should assume the persona of.",
     )
     parser.add_argument(
         "-m",
@@ -47,5 +57,6 @@ def _extract_args_from_cli(args: list[str]) -> CommandArgs:
 
     return CommandArgs(
         prompt=parsed_args.prompt,
+        character=parsed_args.character,
         model=llm_client.Model(parsed_args.model),
     )

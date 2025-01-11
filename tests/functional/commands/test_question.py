@@ -12,8 +12,9 @@ def test_asks_question_to_echo_model_and_gets_response():
     arguments = question.CommandArgs(
         prompt="What is your speciality?",
         model=llm_client.Model.ECHO,
+        character="Eva Perón",
     )
 
     question.ask_question(arguments=arguments)
 
-    assert output.getvalue() == "What is your speciality?\n"
+    assert output.getvalue() == "\n What is your speciality? \n\n"
