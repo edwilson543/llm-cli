@@ -1,4 +1,10 @@
 import abc
+import dataclasses
+
+
+@dataclasses.dataclass
+class LLMClientError(Exception):
+    pass
 
 
 class LLMClient(abc.ABC):
