@@ -16,12 +16,16 @@ requires-python = ">= 3.11"
 
 dependencies = [
     "anthropic",
+    "python-decouple",
     # Dev.
-    "pytest",
     "pytest",
     "ruff",
     "mypy",
 ]
+
+[project.scripts]
+question = "llm_cli.commands.question:ask_question"
+q = "llm_cli.commands.question:ask_question"
 
 # ----------
 # Tooling
