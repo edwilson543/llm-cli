@@ -1,6 +1,5 @@
 import abc
 import dataclasses
-
 from collections.abc import AsyncGenerator
 
 

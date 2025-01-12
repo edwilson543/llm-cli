@@ -1,9 +1,7 @@
 import dataclasses
-
 from collections.abc import AsyncGenerator
 
 import anthropic
-
 from anthropic import types as anthropic_types
 
 from llm_cli import env
