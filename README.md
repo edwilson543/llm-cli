@@ -4,7 +4,7 @@
 - Ask an LLM a question via the command line and stream the response
 - Have the LLM assume a custom persona, for example Gandalf
 
-https://github.com/user-attachments/assets/688a7ea4-7b39-4990-9570-204c505e7845
+https://github.com/user-attachments/assets/d198908a-9f30-4d97-b563-9daf080a5405
 
 ## Installation:
 - Clone the repository and install the application locally
@@ -28,6 +28,7 @@ question 'Have I setup the application correctly?'
 
 ## Supported models:
 - Claude 3.5 Sonnet
+- More soon
 
 ## Usage:
 #### Question:
