@@ -19,6 +19,9 @@ def main():
 
 
 async def ask_question(*, arguments: CommandArgs | None = None) -> None:
+    """
+    Command to ask the model a single question.
+    """
     if arguments is None:
         arguments = _extract_args_from_cli(sys.argv[1:])
 
@@ -49,9 +52,15 @@ def _ask_question_sync(*, client: llm_client.LLMClient, arguments: CommandArgs) 
 async def _ask_question_async(
     *, client: llm_client.LLMClient, arguments: CommandArgs
 ) -> None:
-    async for response_message in client.get_response_async(
-        user_prompt=arguments.question, persona=arguments.persona
-    ):
+    try:
+        response = client.get_response_async(
+            user_prompt=arguments.question, persona=arguments.persona
+        )
+    except llm_client.LLMClientError as exc:
+        print(str(exc))
+        raise
+
+    async for response_message in response:
         print(response_message, end="", flush=True)
 
 
@@ -74,7 +83,7 @@ def _extract_args_from_cli(args: list[str]) -> CommandArgs:
         "-m",
         "--model",
         type=str,
-        choices=[model.value for model in llm_client.Model],
+        choices=[model.value for model in llm_client.Model.available_models()],
         default=llm_client.Model.CLAUDE_3_5_SONNET.value,
         help="The model that should be used.",
     )
