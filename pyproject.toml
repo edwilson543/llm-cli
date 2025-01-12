@@ -18,9 +18,11 @@ dependencies = [
     "anthropic",
     "python-decouple",
     # Dev.
-    "pytest",
-    "ruff",
     "mypy",
+    "pytest",
+    "pytest-asyncio",
+    "pytest-httpx",
+    "ruff",
 ]
 
 [project.scripts]
