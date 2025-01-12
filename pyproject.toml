@@ -18,14 +18,16 @@ dependencies = [
     "anthropic",
     "python-decouple",
     # Dev.
-    "pytest",
-    "ruff",
     "mypy",
+    "pytest",
+    "pytest-asyncio",
+    "pytest-httpx",
+    "ruff",
 ]
 
 [project.scripts]
-question = "llm_cli.commands.question:ask_question"
-q = "llm_cli.commands.question:ask_question"
+question = "llm_cli.commands.question:main"
+q = "llm_cli.commands.question:main"
 
 # ----------
 # Tooling
@@ -70,8 +72,9 @@ ignore = [
 # Sections
 section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
 known-first-party = ["llm_cli", "tests"]
-lines-between-types = 1
 lines-after-imports = 2
+#from-first = true
+#force-sort-within-sections = true
 
 [tool.ruff.lint.per-file-ignores]
 "*__init__.py" = ["F401"]  # Allow convenience imports in __init__.py files.
