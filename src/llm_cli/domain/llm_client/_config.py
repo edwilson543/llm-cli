@@ -1,7 +1,7 @@
 import dataclasses
 import enum
 
-from . import _base, _claude, _echo
+from . import _anthropic, _base, _echo
 
 
 class Model(enum.Enum):
@@ -24,7 +24,7 @@ def get_llm_client(*, model: Model) -> _base.LLMClient:
     Return an LLMClient instance that integrates with the specified model.
     """
     if model == Model.CLAUDE_3_5_SONNET:
-        return _claude.ClaudeClient()
+        return _anthropic.AnthropicClient()
     if model == Model.ECHO:
         return _echo.EchoClient()
     raise ModelNotConfigured(model=model)

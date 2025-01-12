@@ -29,14 +29,15 @@ class AnthropicResponseTypeError(_base.LLMClientError):
     type: str
 
 
-class ClaudeClient(_base.LLMClient):
-    def __init__(self) -> None:
+class AnthropicClient(_base.LLMClient):
+    def __init__(self, api_key: str | None = None) -> None:
         super().__init__()
 
-        try:
-            api_key = env.as_str("ANTHROPIC_API_KEY")
-        except env.EnvironmentVariableNotSet as exc:
-            raise AnthropicAPIKeyNotSet from exc
+        if not api_key:
+            try:
+                api_key = env.as_str("ANTHROPIC_API_KEY")
+            except env.EnvironmentVariableNotSet as exc:
+                raise AnthropicAPIKeyNotSet from exc
 
         self._client = anthropic.Client(api_key=api_key)
         self._async_client = anthropic.AsyncClient(api_key=api_key)
@@ -71,16 +72,17 @@ class ClaudeClient(_base.LLMClient):
         if persona:
             self._add_persona_to_system_prompt(persona=persona)
 
-        async with self._async_client.messages.stream(
-            model=self._model,
-            max_tokens=self._max_tokens,
-            system=self._system_prompt,
-            messages=[{"role": "user", "content": user_prompt}],
-        ) as stream:
-            async for text in stream.text_stream:
-                yield text
-
-        await stream.get_final_message()
+        try:
+            async with self._async_client.messages.stream(
+                model=self._model,
+                max_tokens=self._max_tokens,
+                system=self._system_prompt,
+                messages=[{"role": "user", "content": user_prompt}],
+            ) as stream:
+                async for text in stream.text_stream:
+                    yield text
+        except anthropic.APIStatusError as exc:
+            raise AnthropicAPIError(status_code=exc.status_code)
 
     def _add_persona_to_system_prompt(self, persona: str) -> None:
         self._system_prompt += f"Please assume the persona of {persona}."
