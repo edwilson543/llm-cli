@@ -45,9 +45,9 @@ class ClaudeClient(_base.LLMClient):
 
         self._system_prompt = "Please be as succinct as possible in your answer. "
 
-    def get_response(self, *, user_prompt: str, character: str | None = None) -> str:
-        if character:
-            self._add_character_to_system_prompt(character=character)
+    def get_response(self, *, user_prompt: str, persona: str | None = None) -> str:
+        if persona:
+            self._add_persona_to_system_prompt(persona=persona)
 
         try:
             message = self._client.messages.create(
@@ -66,10 +66,10 @@ class ClaudeClient(_base.LLMClient):
         return response.text
 
     async def get_response_async(
-        self, *, user_prompt: str, character: str | None = None
+        self, *, user_prompt: str, persona: str | None = None
     ) -> AsyncGenerator[str, None]:
-        if character:
-            self._add_character_to_system_prompt(character=character)
+        if persona:
+            self._add_persona_to_system_prompt(persona=persona)
 
         async with self._async_client.messages.stream(
             model=self._model,
@@ -82,5 +82,5 @@ class ClaudeClient(_base.LLMClient):
 
         await stream.get_final_message()
 
-    def _add_character_to_system_prompt(self, character: str) -> None:
-        self._system_prompt += f"Please assume the persona of {character}."
+    def _add_persona_to_system_prompt(self, persona: str) -> None:
+        self._system_prompt += f"Please assume the persona of {persona}."

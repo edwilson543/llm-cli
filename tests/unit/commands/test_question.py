@@ -10,10 +10,10 @@ class TestExtractArgsFromCli:
 
         extracted_args = question._extract_args_from_cli(raw_args)
 
-        assert extracted_args.prompt == "What do you find interesting?"
+        assert extracted_args.question == "What do you find interesting?"
         # Ensure the defaults are set as expected.
         assert extracted_args.model == llm_client.Model.CLAUDE_3_5_SONNET
-        assert extracted_args.character is None
+        assert extracted_args.persona is None
 
     @pytest.mark.parametrize("model_flag", ["-m", "--model"])
     def test_gets_model_specified_via_shorthand_or_longhand_arg(self, model_flag: str):
@@ -23,16 +23,16 @@ class TestExtractArgsFromCli:
 
         assert extracted_args.model == llm_client.Model.ECHO
 
-    @pytest.mark.parametrize("character_flag", ["-c", "--character"])
-    def test_gets_model_specified_via_shorthand_arg(self, character_flag: str):
-        raw_args = ["What's for breakfast'?", character_flag, "gandalf"]
+    @pytest.mark.parametrize("persona_flag", ["-p", "--persona"])
+    def test_gets_model_specified_via_shorthand_arg(self, persona_flag: str):
+        raw_args = ["What's for breakfast'?", persona_flag, "gandalf"]
 
         extracted_args = question._extract_args_from_cli(raw_args)
 
-        assert extracted_args.character == "gandalf"
+        assert extracted_args.persona == "gandalf"
 
-    def test_raises_when_prompt_is_specified_incorrectly(self):
-        args = ["--prompt", "What do you find interesting?"]
+    def test_raises_when_question_argument_is_specified_incorrectly(self):
+        args = ["-q", "What do you find interesting?"]
 
         with pytest.raises(SystemExit):
             question._extract_args_from_cli(args)

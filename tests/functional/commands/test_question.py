@@ -13,9 +13,9 @@ async def test_asks_question_to_echo_model_and_gets_response_synchronously():
     sys.stdout = output
 
     arguments = question.CommandArgs(
-        prompt="What is your speciality?",
+        question="What is your speciality?",
         model=llm_client.Model.ECHO,
-        character="Eva Perón",
+        persona="Eva Perón",
         stream=False,
     )
 
@@ -30,12 +30,12 @@ async def test_asks_question_to_echo_model_and_gets_response_asynchronously():
     sys.stdout = output
 
     arguments = question.CommandArgs(
-        prompt="Have you got much on today?",
+        question="Have you got much on today?",
         model=llm_client.Model.ECHO,
-        character=None,
+        persona=None,
         stream=True,
     )
 
     await question.ask_question(arguments=arguments)
 
-    assert output.getvalue() == "\nHave you got much on today?\n"
+    assert output.getvalue() == "\nHave you got much on today?\n\n"

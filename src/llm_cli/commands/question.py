@@ -8,8 +8,8 @@ from llm_cli.domain import llm_client
 
 @dataclasses.dataclass
 class CommandArgs:
-    prompt: str
-    character: str | None
+    question: str
+    persona: str | None
     model: llm_client.Model
     stream: bool
 
@@ -31,43 +31,44 @@ async def ask_question(*, arguments: CommandArgs | None = None) -> None:
     else:
         _ask_question_sync(client=client, arguments=arguments)
 
+    print("\n")
+
 
 def _ask_question_sync(*, client: llm_client.LLMClient, arguments: CommandArgs) -> None:
     try:
         response_message = client.get_response(
-            user_prompt=arguments.prompt, character=arguments.character
+            user_prompt=arguments.question, persona=arguments.persona
         )
     except llm_client.LLMClientError as exc:
         print(str(exc))
         raise
 
-    print(response_message,"\n")
+    print(response_message, end="")
 
 
 async def _ask_question_async(
     *, client: llm_client.LLMClient, arguments: CommandArgs
 ) -> None:
     async for response_message in client.get_response_async(
-        user_prompt=arguments.prompt, character=arguments.character
+        user_prompt=arguments.question, persona=arguments.persona
     ):
         print(response_message, end="", flush=True)
-    print("\n")
 
 
 def _extract_args_from_cli(args: list[str]) -> CommandArgs:
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        "prompt",
+        "question",
         type=str,
-        help="The user prompt for the LLM.",
+        help="The question the model should answer.",
     )
     parser.add_argument(
-        "-c",
-        "--character",
+        "-p",
+        "--persona",
         type=str,
         required=False,
-        help="The character the LLM should assume the persona of.",
+        help="The persona the model should assume.",
     )
     parser.add_argument(
         "-m",
@@ -75,7 +76,7 @@ def _extract_args_from_cli(args: list[str]) -> CommandArgs:
         type=str,
         choices=[model.value for model in llm_client.Model],
         default=llm_client.Model.CLAUDE_3_5_SONNET.value,
-        help="The model to ask the question to.",
+        help="The model that should be used.",
     )
     parser.add_argument(
         "-s",
@@ -87,8 +88,8 @@ def _extract_args_from_cli(args: list[str]) -> CommandArgs:
     parsed_args = parser.parse_args(args)
 
     return CommandArgs(
-        prompt=parsed_args.prompt,
-        character=parsed_args.character,
+        question=parsed_args.question,
+        persona=parsed_args.persona,
         model=llm_client.Model(parsed_args.model),
         stream=parsed_args.stream,
     )
