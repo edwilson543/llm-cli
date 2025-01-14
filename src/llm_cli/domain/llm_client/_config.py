@@ -3,11 +3,12 @@ from __future__ import annotations
 import dataclasses
 import enum
 
-from . import _anthropic, _base, _broken, _echo
+from . import _anthropic, _base, _broken, _echo, _xai
 
 
 class Model(enum.Enum):
     CLAUDE_3_5_SONNET = "CLAUDE_3_5_SONNET"
+    GROK_2 = "GROK_2"
 
     # Local implementations.
     ECHO = "ECHO"
@@ -38,6 +39,8 @@ def get_llm_client(*, model: Model) -> _base.LLMClient:
     """
     if model == Model.CLAUDE_3_5_SONNET:
         return _anthropic.AnthropicClient()
+    if model == Model.GROK_2:
+        return _xai.XAIClient()
     if model == Model.ECHO:
         return _echo.EchoClient()
     if model == Model.BROKEN:
