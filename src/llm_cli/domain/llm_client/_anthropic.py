@@ -4,14 +4,7 @@ from collections.abc import AsyncGenerator
 import anthropic
 from anthropic import types as anthropic_types
 
-from llm_cli import env
 from llm_cli.domain.llm_client import _base
-
-
-@dataclasses.dataclass
-class AnthropicAPIKeyNotSet(_base.LLMClientError):
-    def __str__(self) -> str:
-        return "The 'ANTHROPIC_API_KEY' environment variable is not set."
 
 
 @dataclasses.dataclass
@@ -28,18 +21,21 @@ class AnthropicResponseTypeError(_base.LLMClientError):
 
 
 class AnthropicClient(_base.LLMClient):
-    def __init__(self, api_key: str | None = None) -> None:
+    _api_key_env_var = "ANTHROPIC_API_KEY"
+
+    def __init__(
+        self,
+        api_key: str | None = None,
+        base_url: str | None = None,
+        model: str | None = None,
+    ) -> None:
         super().__init__()
 
-        if not api_key:
-            try:
-                api_key = env.as_str("ANTHROPIC_API_KEY")
-            except env.EnvironmentVariableNotSet as exc:
-                raise AnthropicAPIKeyNotSet from exc
+        api_key = self._get_api_key(api_key=api_key)
 
-        self._client = anthropic.Client(api_key=api_key)
-        self._async_client = anthropic.AsyncClient(api_key=api_key)
-        self._model = "claude-3-5-sonnet-20241022"
+        self._client = anthropic.Client(api_key=api_key, base_url=base_url)
+        self._async_client = anthropic.AsyncClient(api_key=api_key, base_url=base_url)
+        self._model = model or "claude-3-5-sonnet-20241022"
         self._max_tokens = 1024
 
         self._system_prompt = "Please be as succinct as possible in your answer. "
