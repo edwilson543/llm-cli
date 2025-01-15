@@ -1,31 +1,11 @@
-from __future__ import annotations
-
 import dataclasses
-import enum
 
-from . import _anthropic, _base, _broken, _echo, _xai
-
-
-class Model(enum.Enum):
-    CLAUDE_3_5_SONNET = "CLAUDE_3_5_SONNET"
-    GROK_2 = "GROK_2"
-
-    # Local implementations.
-    ECHO = "ECHO"
-    BROKEN = "BROKEN"
-
-    @classmethod
-    def available_models(cls) -> list[Model]:
-        return [model for model in cls if model not in cls.unavailable_models()]
-
-    @classmethod
-    def unavailable_models(cls) -> list[Model]:
-        return [cls.BROKEN]
+from . import _anthropic, _base, _broken, _echo, _models, _xai
 
 
 @dataclasses.dataclass
 class ModelNotConfigured(_base.LLMClientError):
-    model: Model
+    model: _models.Model
 
     def __str__(self) -> str:
         return (
@@ -33,16 +13,16 @@ class ModelNotConfigured(_base.LLMClientError):
         )
 
 
-def get_llm_client(*, model: Model) -> _base.LLMClient:
+def get_llm_client(*, model: _models.Model) -> _base.LLMClient:
     """
     Return an LLMClient instance that integrates with the specified model.
     """
-    if model == Model.CLAUDE_3_5_SONNET:
+    if model == _models.Model.CLAUDE_SONNET:
         return _anthropic.AnthropicClient()
-    if model == Model.GROK_2:
+    if model == _models.Model.GROK_2:
         return _xai.XAIClient()
-    if model == Model.ECHO:
+    if model == _models.Model.ECHO:
         return _echo.EchoClient()
-    if model == Model.BROKEN:
+    if model == _models.Model.BROKEN:
         return _broken.BrokenClient()
     raise ModelNotConfigured(model=model)

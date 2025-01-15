@@ -84,7 +84,7 @@ def _extract_args_from_cli(args: list[str]) -> CommandArgs:
         "--model",
         type=str,
         choices=[model.value for model in llm_client.Model.available_models()],
-        default=llm_client.Model.CLAUDE_3_5_SONNET.value,
+        default=llm_client.Model.CLAUDE_SONNET.value,
         help="The model that should be used.",
     )
     parser.add_argument(

@@ -4,7 +4,7 @@ from collections.abc import AsyncGenerator
 import anthropic
 from anthropic import types as anthropic_types
 
-from llm_cli.domain.llm_client import _base
+from llm_cli.domain.llm_client import _base, _models
 
 
 @dataclasses.dataclass
@@ -27,7 +27,7 @@ class AnthropicClient(_base.LLMClient):
         self,
         api_key: str | None = None,
         base_url: str | None = None,
-        model: str | None = None,
+        model: _models.Model | None = None,
     ) -> None:
         super().__init__()
 
@@ -35,7 +35,7 @@ class AnthropicClient(_base.LLMClient):
 
         self._client = anthropic.Client(api_key=api_key, base_url=base_url)
         self._async_client = anthropic.AsyncClient(api_key=api_key, base_url=base_url)
-        self._model = model or "claude-3-5-sonnet-20241022"
+        self._model = model or _models.Model.CLAUDE_SONNET
         self._max_tokens = 1024
 
         self._system_prompt = "Please be as succinct as possible in your answer. "
@@ -46,7 +46,7 @@ class AnthropicClient(_base.LLMClient):
 
         try:
             message = self._client.messages.create(
-                model=self._model,
+                model=self._model.value,
                 max_tokens=self._max_tokens,
                 system=self._system_prompt,
                 messages=[{"role": "user", "content": user_prompt}],
@@ -68,7 +68,7 @@ class AnthropicClient(_base.LLMClient):
 
         try:
             async with self._async_client.messages.stream(
-                model=self._model,
+                model=self._model.value,
                 max_tokens=self._max_tokens,
                 system=self._system_prompt,
                 messages=[{"role": "user", "content": user_prompt}],
