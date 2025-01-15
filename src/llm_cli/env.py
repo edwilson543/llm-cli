@@ -8,7 +8,7 @@ env_file = pathlib.Path(__file__).parents[2] / ".env"
 env_config = decouple.Config(decouple.RepositoryEnv(env_file))
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class EnvironmentVariableNotSet(Exception):
     key: str
 

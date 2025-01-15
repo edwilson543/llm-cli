@@ -6,7 +6,7 @@ import sys
 from llm_cli.domain import llm_client
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class CommandArgs:
     question: str
     persona: str | None

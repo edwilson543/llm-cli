@@ -3,7 +3,7 @@ import dataclasses
 from . import _anthropic, _base, _broken, _echo, _models, _xai
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class ModelNotConfigured(_base.LLMClientError):
     model: _models.Model
 

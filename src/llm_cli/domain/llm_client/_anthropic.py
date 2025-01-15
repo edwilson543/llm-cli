@@ -7,7 +7,7 @@ from anthropic import types as anthropic_types
 from llm_cli.domain.llm_client import _base, _models
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class AnthropicAPIError(_base.LLMClientError):
     status_code: int
 
@@ -15,7 +15,7 @@ class AnthropicAPIError(_base.LLMClientError):
         return f"Unable to get a response. The Anthropic API responded with status code: {self.status_code}."
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class AnthropicResponseTypeError(_base.LLMClientError):
     type: str
 
