@@ -1,7 +1,8 @@
 from unittest import mock
 
-from llm_cli.domain.llm_client import _anthropic, _broken, _config, _echo, _models, _xai
 import pytest
+
+from llm_cli.domain.llm_client import _anthropic, _broken, _config, _echo, _models, _xai
 
 
 class TestGetLLMClient:

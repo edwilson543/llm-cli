@@ -22,7 +22,10 @@ class TestQuestionNotStreamed:
 
         await question.ask_question(arguments=arguments)
 
-        assert output.getvalue() == "\nWhat is your speciality?\n\n"
+        assert (
+            output.getvalue()
+            == "\033[96m\nEva Perón:\n---\nWhat is your speciality?\n---\n\n"
+        )
 
     @pytest.mark.asyncio
     async def test_handles_error_raised_by_broken_client(self):
@@ -36,8 +39,12 @@ class TestQuestionNotStreamed:
             stream=False,
         )
 
-        with pytest.raises(llm_client.LLMClientError):
-            await question.ask_question(arguments=arguments)
+        await question.ask_question(arguments=arguments)
+
+        assert (
+            output.getvalue()
+            == "\033[96m\nbroken:\n---\nUnable to get a response from 'FAKE_AI'. \n---\n\n"
+        )
 
 
 class TestQuestionStreamed:
@@ -55,4 +62,7 @@ class TestQuestionStreamed:
 
         await question.ask_question(arguments=arguments)
 
-        assert output.getvalue() == "\nHave you got much on today?\n\n"
+        assert (
+            output.getvalue()
+            == "\033[96m\necho:\n---\nHave you got much on today?\n---\n\n"
+        )

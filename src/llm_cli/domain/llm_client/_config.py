@@ -10,9 +10,7 @@ class ModelNotConfigured(_base.LLMClientError):
     model: _models.Model
 
     def __str__(self) -> str:
-        return (
-            f"No LLMClient implementation is installed for model '{self.model.official_name}'."
-        )
+        return f"No LLMClient implementation is installed for model '{self.model.official_name}'."
 
 
 def get_llm_client(*, model: _models.Model) -> _base.LLMClient:

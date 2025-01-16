@@ -35,7 +35,9 @@ class AnthropicClient(_base.LLMClient):
 
         self._client = anthropic.Client(api_key=api_key, base_url=base_url)
         self._async_client = anthropic.AsyncClient(api_key=api_key, base_url=base_url)
-        self._model = model.official_name if model else _models.CLAUDE_SONNET.official_name
+        self._model = (
+            model.official_name if model else _models.CLAUDE_SONNET.official_name
+        )
         self._max_tokens = 1024
 
         self._system_prompt = "Please be as succinct as possible in your answer. "
