@@ -1,7 +1,6 @@
 import pytest
 
 from llm_cli.commands import question
-from llm_cli.domain import llm_client
 
 
 class TestExtractArgsFromCli:
@@ -12,16 +11,16 @@ class TestExtractArgsFromCli:
 
         assert extracted_args.question == "What do you find interesting?"
         # Ensure the defaults are set as expected.
-        assert extracted_args.model == llm_client.Model.CLAUDE_3_5_SONNET
+        assert extracted_args.model.friendly_name == "claude-sonnet"
         assert extracted_args.persona is None
 
     @pytest.mark.parametrize("model_flag", ["-m", "--model"])
     def test_gets_model_specified_via_shorthand_or_longhand_arg(self, model_flag: str):
-        raw_args = ["What do you find interesting?", model_flag, "ECHO"]
+        raw_args = ["What do you find interesting?", model_flag, "echo"]
 
         extracted_args = question._extract_args_from_cli(raw_args)
 
-        assert extracted_args.model == llm_client.Model.ECHO
+        assert extracted_args.model.friendly_name == "echo"
 
     @pytest.mark.parametrize("persona_flag", ["-p", "--persona"])
     def test_gets_model_specified_via_shorthand_arg(self, persona_flag: str):

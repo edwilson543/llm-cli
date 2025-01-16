@@ -4,10 +4,10 @@ from collections.abc import AsyncGenerator
 import anthropic
 from anthropic import types as anthropic_types
 
-from llm_cli.domain.llm_client import _base
+from llm_cli.domain.llm_client import _base, _models
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class AnthropicAPIError(_base.LLMClientError):
     status_code: int
 
@@ -15,7 +15,7 @@ class AnthropicAPIError(_base.LLMClientError):
         return f"Unable to get a response. The Anthropic API responded with status code: {self.status_code}."
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class AnthropicResponseTypeError(_base.LLMClientError):
     type: str
 
@@ -27,7 +27,7 @@ class AnthropicClient(_base.LLMClient):
         self,
         api_key: str | None = None,
         base_url: str | None = None,
-        model: str | None = None,
+        model: _models.Model | None = None,
     ) -> None:
         super().__init__()
 
@@ -35,7 +35,9 @@ class AnthropicClient(_base.LLMClient):
 
         self._client = anthropic.Client(api_key=api_key, base_url=base_url)
         self._async_client = anthropic.AsyncClient(api_key=api_key, base_url=base_url)
-        self._model = model or "claude-3-5-sonnet-20241022"
+        self._model = (
+            model.official_name if model else _models.CLAUDE_SONNET.official_name
+        )
         self._max_tokens = 1024
 
         self._system_prompt = "Please be as succinct as possible in your answer. "

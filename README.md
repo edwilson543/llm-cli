@@ -27,7 +27,7 @@ question 'Have I setup the application correctly?'
 ```
 
 ## Supported models:
-- Claude 3.5 Sonnet
+- Claude {Haiku, Sonnet, Opus}
 - Grok 2
 - More soon
 
@@ -36,7 +36,7 @@ question 'Have I setup the application correctly?'
 ```bash
 >>> question --help
 
-usage: question [-h] [-p PERSONA] [-m {CLAUDE_3_5_SONNET,GROK_2,ECHO}] [-s] question
+usage: question [-h] [-p PERSONA] [-m {claude-haiku,claude-sonnet,claude-opus,grok-2,echo,broken}] [-s] question
 
 positional arguments:
   question              The question the model should answer.
@@ -45,7 +45,7 @@ options:
   -h, --help            show this help message and exit
   -p PERSONA, --persona PERSONA
                         The persona the model should assume.
-  -m {CLAUDE_3_5_SONNET,GROK_2,ECHO}, --model {CLAUDE_3_5_SONNET,GROK_2,ECHO}
+  -m {claude-haiku,claude-sonnet,claude-opus,grok-2,echo,broken}, --model {claude-haiku,claude-sonnet,claude-opus,grok-2,echo,broken}
                         The model that should be used.
   -s, --stream          Whether to stream the response from the model asynchronously.
 ```

@@ -5,12 +5,12 @@ from collections.abc import AsyncGenerator
 from llm_cli import env
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class LLMClientError(Exception):
     pass
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class APIKeyNotSet(LLMClientError):
     env_var: str
 

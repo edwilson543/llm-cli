@@ -1,48 +1,47 @@
-from __future__ import annotations
-
 import dataclasses
-import enum
 
-from . import _anthropic, _base, _broken, _echo, _xai
+from llm_cli import env
 
-
-class Model(enum.Enum):
-    CLAUDE_3_5_SONNET = "CLAUDE_3_5_SONNET"
-    GROK_2 = "GROK_2"
-
-    # Local implementations.
-    ECHO = "ECHO"
-    BROKEN = "BROKEN"
-
-    @classmethod
-    def available_models(cls) -> list[Model]:
-        return [model for model in cls if model not in cls.unavailable_models()]
-
-    @classmethod
-    def unavailable_models(cls) -> list[Model]:
-        return [cls.BROKEN]
+from . import _anthropic, _base, _broken, _echo, _models, _xai
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class ModelNotConfigured(_base.LLMClientError):
-    model: Model
+    model: _models.Model
 
     def __str__(self) -> str:
-        return (
-            f"No LLMClient implementation is installed for model '{self.model.value}'."
-        )
+        return f"No LLMClient implementation is installed for model '{self.model.official_name}'."
 
 
-def get_llm_client(*, model: Model) -> _base.LLMClient:
+def get_llm_client(*, model: _models.Model) -> _base.LLMClient:
     """
     Return an LLMClient instance that integrates with the specified model.
     """
-    if model == Model.CLAUDE_3_5_SONNET:
-        return _anthropic.AnthropicClient()
-    if model == Model.GROK_2:
-        return _xai.XAIClient()
-    if model == Model.ECHO:
+    if model.vendor == _models.Vendor.ANTHROPIC:
+        return _anthropic.AnthropicClient(model=model)
+    elif model.vendor == _models.Vendor.XAI:
+        return _xai.XAIClient(model=model)
+    elif model.friendly_name == "echo":
         return _echo.EchoClient()
-    if model == Model.BROKEN:
+    elif model.friendly_name == "broken":
         return _broken.BrokenClient()
     raise ModelNotConfigured(model=model)
+
+
+def get_available_models() -> list[_models.Model]:
+    return [
+        _models.CLAUDE_HAIKU,
+        _models.CLAUDE_SONNET,
+        _models.CLAUDE_OPUS,
+        _models.GROK_2,
+        _models.ECHO,
+        _models.BROKEN,
+    ]
+
+
+def get_default_model() -> _models.Model:
+    default_model = env.as_str("DEFAULT_MODEL")
+    for model in get_available_models():
+        if model.friendly_name == default_model:
+            return model
+    return _models.CLAUDE_SONNET
