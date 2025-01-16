@@ -1,9 +1,14 @@
 import argparse
 import asyncio
 import dataclasses
+import re
 import sys
+import textwrap
 
 from llm_cli.domain import llm_client
+
+
+MAX_LINE_WIDTH = 80
 
 
 @dataclasses.dataclass(frozen=True)
@@ -53,7 +58,7 @@ def _ask_question_sync(*, client: llm_client.LLMClient, arguments: CommandArgs) 
         print(response_message, end="")
         return
 
-    print(response_message, end="")
+    print(textwrap.fill(response_message, MAX_LINE_WIDTH), end="")
 
 
 async def _ask_question_async(
@@ -67,8 +72,18 @@ async def _ask_question_async(
         print(str(exc))
         raise
 
+    current_width = 0
     async for response_message in response:
-        print(response_message, end="", flush=True)
+        for word in re.split(r"(\s+)", response_message):
+            if len(word) + current_width < MAX_LINE_WIDTH:
+                print(word, end="", flush=True)
+                current_width += len(word)
+            else:
+                print("\n", word.lstrip(), sep="", end="", flush=True)
+                current_width = len(word)
+
+            if (last_line_break := word.rfind("\n")) > 0:
+                current_width = last_line_break
 
 
 def _extract_args_from_cli(args: list[str]) -> CommandArgs:
