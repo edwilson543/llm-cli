@@ -83,8 +83,8 @@ def _extract_args_from_cli(args: list[str]) -> CommandArgs:
         "-m",
         "--model",
         type=str,
-        choices=[model.value for model in llm_client.Model.available_models()],
-        default=llm_client.Model.CLAUDE_SONNET.value,
+        choices=[model.friendly_name for model in llm_client.get_available_models()],
+        default=llm_client.get_default_model().friendly_name,
         help="The model that should be used.",
     )
     parser.add_argument(
@@ -99,6 +99,12 @@ def _extract_args_from_cli(args: list[str]) -> CommandArgs:
     return CommandArgs(
         question=parsed_args.question,
         persona=parsed_args.persona,
-        model=llm_client.Model(parsed_args.model),
+        model=_get_model_from_friendly_name(parsed_args.model),
         stream=parsed_args.stream,
     )
+
+
+def _get_model_from_friendly_name(friendly_name: str) -> llm_client.Model:
+    for model in llm_client.get_available_models():
+        if model.friendly_name == friendly_name:
+            return model

@@ -9,7 +9,7 @@ class XAIClient(_anthropic.AnthropicClient):
 
     _api_key_env_var = "XAI_API_KEY"
 
-    def __init__(self, api_key: str | None = None) -> None:
-        super().__init__(
-            api_key=api_key, base_url="https://api.x.ai", model=_models.Model.GROK_2
-        )
+    def __init__(
+        self, api_key: str | None = None, model: _models.Model | None = None
+    ) -> None:
+        super().__init__(api_key=api_key, base_url="https://api.x.ai", model=model)

@@ -15,7 +15,7 @@ class TestQuestionNotStreamed:
 
         arguments = question.CommandArgs(
             question="What is your speciality?",
-            model=llm_client.Model.ECHO,
+            model=llm_client.ECHO,
             persona="Eva Perón",
             stream=False,
         )
@@ -31,7 +31,7 @@ class TestQuestionNotStreamed:
 
         arguments = question.CommandArgs(
             question="What is your speciality?",
-            model=llm_client.Model.BROKEN,
+            model=llm_client.BROKEN,
             persona=None,
             stream=False,
         )
@@ -48,7 +48,7 @@ class TestQuestionStreamed:
 
         arguments = question.CommandArgs(
             question="Have you got much on today?",
-            model=llm_client.Model.ECHO,
+            model=llm_client.ECHO,
             persona=None,
             stream=True,
         )

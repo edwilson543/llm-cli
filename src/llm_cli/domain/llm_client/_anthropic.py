@@ -35,7 +35,7 @@ class AnthropicClient(_base.LLMClient):
 
         self._client = anthropic.Client(api_key=api_key, base_url=base_url)
         self._async_client = anthropic.AsyncClient(api_key=api_key, base_url=base_url)
-        self._model = model or _models.Model.CLAUDE_SONNET
+        self._model = model.official_name if model else _models.CLAUDE_SONNET.official_name
         self._max_tokens = 1024
 
         self._system_prompt = "Please be as succinct as possible in your answer. "
@@ -46,7 +46,7 @@ class AnthropicClient(_base.LLMClient):
 
         try:
             message = self._client.messages.create(
-                model=self._model.value,
+                model=self._model,
                 max_tokens=self._max_tokens,
                 system=self._system_prompt,
                 messages=[{"role": "user", "content": user_prompt}],
@@ -68,7 +68,7 @@ class AnthropicClient(_base.LLMClient):
 
         try:
             async with self._async_client.messages.stream(
-                model=self._model.value,
+                model=self._model,
                 max_tokens=self._max_tokens,
                 system=self._system_prompt,
                 messages=[{"role": "user", "content": user_prompt}],
