@@ -4,7 +4,9 @@
 - Ask an LLM a question via the command line and stream the response
 - Have the LLM assume a custom persona, for example Gandalf
 
-https://github.com/user-attachments/assets/d198908a-9f30-4d97-b563-9daf080a5405
+https://github.com/user-attachments/assets/268191ff-a0bb-434a-ac2a-24f84b49dc58
+
+https://github.com/user-attachments/assets/5c3486e7-c54e-48c5-848e-35a42164f7aa
 
 ## Installation:
 - Clone the repository and install the application locally
