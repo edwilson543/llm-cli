@@ -23,7 +23,7 @@ class LLMClient(abc.ABC):
 
     @abc.abstractmethod
     async def stream_response(
-        self, *, user_prompt: str, persona: str | None = None
+        self, *, user_prompt: str, system_prompt: str
     ) -> AsyncGenerator[str, None]:
         raise NotImplementedError
 

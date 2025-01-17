@@ -16,6 +16,13 @@ class CommandArgs:
     persona: str | None
     model: llm_client.Model
 
+    @property
+    def system_prompt(self) -> str:
+        prompt = "Please be as succinct as possible in your answer. "
+        if self.persona:
+            prompt += f"Please assume the persona of {self.persona}."
+        return prompt
+
 
 def main():
     asyncio.run(ask_question())
@@ -58,7 +65,7 @@ async def _stream_response_and_print_formatted_output(
     current_width = 0
 
     async for response_message in client.stream_response(
-        user_prompt=arguments.question, persona=arguments.persona
+        user_prompt=arguments.question, system_prompt=arguments.system_prompt
     ):
         for word in re.split(r"(\s+)", response_message):
             if len(word) + current_width < MAX_LINE_WIDTH:

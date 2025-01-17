@@ -14,7 +14,7 @@ class BrokenClient(_base.LLMClient):
     """
 
     async def stream_response(
-        self, *, user_prompt: str, persona: str | None = None
+        self, *, user_prompt: str, system_prompt: str
     ) -> AsyncGenerator[str, None]:
         for _ in range(0, 1):
             yield ""

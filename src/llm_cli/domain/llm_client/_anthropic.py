@@ -34,25 +34,17 @@ class AnthropicClient(_base.LLMClient):
         )
         self._max_tokens = 1024
 
-        self._system_prompt = "Please be as succinct as possible in your answer. "
-
     async def stream_response(
-        self, *, user_prompt: str, persona: str | None = None
+        self, *, user_prompt: str, system_prompt: str
     ) -> AsyncGenerator[str, None]:
-        if persona:
-            self._add_persona_to_system_prompt(persona=persona)
-
         try:
             async with self._async_client.messages.stream(
                 model=self._model,
                 max_tokens=self._max_tokens,
-                system=self._system_prompt,
+                system=system_prompt,
                 messages=[{"role": "user", "content": user_prompt}],
             ) as stream:
                 async for text in stream.text_stream:
                     yield text
         except anthropic.APIStatusError as exc:
             raise AnthropicAPIError(status_code=exc.status_code)
-
-    def _add_persona_to_system_prompt(self, persona: str) -> None:
-        self._system_prompt += f"Please assume the persona of {persona}."

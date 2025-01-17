@@ -9,5 +9,7 @@ class TestGetResponseAsync:
         client = _broken.BrokenClient()
 
         with pytest.raises(_base.LLMClientError):
-            async for _ in client.stream_response(user_prompt="Do you work?"):
+            async for _ in client.stream_response(
+                user_prompt="Do you work?", system_prompt=""
+            ):
                 pass

@@ -19,7 +19,9 @@ class TestGetResponseAsync:
             is_reusable=True,
         )
 
-        result = client.stream_response(user_prompt="Tell me about your constitution.")
+        result = client.stream_response(
+            user_prompt="Tell me about your constitution.", system_prompt=""
+        )
 
         response = "".join([text async for text in result])
         assert response == "I have no idea!"
@@ -40,7 +42,8 @@ class TestGetResponseAsync:
 
         with pytest.raises(_anthropic.AnthropicAPIError) as exc:
             async for _ in client.stream_response(
-                user_prompt="Tell me about your constitution."
+                user_prompt="Tell me about your constitution.",
+                system_prompt="",
             ):
                 pass
 
