@@ -57,7 +57,7 @@ async def _stream_response_and_print_formatted_output(
 ) -> None:
     current_width = 0
 
-    async for response_message in client.get_response_async(
+    async for response_message in client.stream_response(
         user_prompt=arguments.question, persona=arguments.persona
     ):
         for word in re.split(r"(\s+)", response_message):

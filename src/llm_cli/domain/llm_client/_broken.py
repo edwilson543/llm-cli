@@ -8,7 +8,7 @@ class BrokenClient(_base.LLMClient):
     Raise an exception whenever any method is called.
     """
 
-    async def get_response_async(
+    async def stream_response(
         self, *, user_prompt: str, persona: str | None = None
     ) -> AsyncGenerator[str, None]:
         for _ in range(0, 1):

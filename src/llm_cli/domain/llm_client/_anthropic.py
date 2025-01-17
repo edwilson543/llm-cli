@@ -41,7 +41,7 @@ class AnthropicClient(_base.LLMClient):
 
         self._system_prompt = "Please be as succinct as possible in your answer. "
 
-    async def get_response_async(
+    async def stream_response(
         self, *, user_prompt: str, persona: str | None = None
     ) -> AsyncGenerator[str, None]:
         if persona:

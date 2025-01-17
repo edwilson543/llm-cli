@@ -21,7 +21,7 @@ class TestGetResponseAsync:
             is_reusable=True,
         )
 
-        result = client.get_response_async(user_prompt="What's nine minus eight?")
+        result = client.stream_response(user_prompt="What's nine minus eight?")
 
         response = "".join([text async for text in result])
         assert response == "I have no idea!"
