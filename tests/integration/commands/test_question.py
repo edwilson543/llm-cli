@@ -21,10 +21,8 @@ async def test_asks_question_to_echo_model_and_gets_response():
 
     await question.ask_question(arguments=arguments)
 
-    assert (
-        output.getvalue()
-        == "\033[96m\nEva Perón:\n---\nWhat is your speciality?\n---\n\n"
-    )
+    expected_output = "\033[96m\nEva Perón:\n---\nWhat is your speciality?\n---\n\n"
+    assert output.getvalue() == expected_output
 
 
 @pytest.mark.asyncio

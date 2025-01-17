@@ -1,3 +1,4 @@
+import re
 from typing import AsyncGenerator
 
 from llm_cli.domain.llm_client import _base
@@ -11,5 +12,5 @@ class EchoClient(_base.LLMClient):
     async def stream_response(
         self, *, user_prompt: str, system_prompt: str
     ) -> AsyncGenerator[str, None]:
-        for letter in user_prompt:
-            yield letter
+        for word in re.split(r"(\s+)", user_prompt):
+            yield word

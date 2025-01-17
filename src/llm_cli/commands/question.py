@@ -60,23 +60,29 @@ async def ask_question(*, arguments: CommandArgs | None = None) -> None:
 
 
 async def _stream_response_and_print_formatted_output(
-    *, client: llm_client.LLMClient, arguments: CommandArgs
+    *,
+    client: llm_client.LLMClient,
+    arguments: CommandArgs,
+    max_line_width: int = MAX_LINE_WIDTH,
 ) -> None:
-    current_width = 0
+    current_line_width = 0
 
     async for response_message in client.stream_response(
         user_prompt=arguments.question, system_prompt=arguments.system_prompt
     ):
-        for word in re.split(r"(\s+)", response_message):
-            if len(word) + current_width < MAX_LINE_WIDTH:
+        words_with_spaces = re.split(r"(\s+)", response_message)
+
+        for word in words_with_spaces:
+            if len(word) + current_line_width <= max_line_width:
                 print(word, end="", flush=True)
-                current_width += len(word)
+                current_line_width += len(word)
             else:
                 print("\n", word.lstrip(), sep="", end="", flush=True)
-                current_width = len(word)
+                current_line_width = len(word)
 
-            if (last_line_break := word.rfind("\n")) > 0:
-                current_width = len(word) - last_line_break
+            final_line_break_in_word = word.rfind("\n")
+            if final_line_break_in_word > 0:
+                current_line_width = len(word) - final_line_break_in_word
 
 
 def _extract_args_from_cli(args: list[str]) -> CommandArgs:
