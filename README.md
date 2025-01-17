@@ -1,12 +1,14 @@
-# WIP project to develop a vendor agnostic LLM CLI
+# Vendor agnostic LLM CLI
 
 ## Features:
-- Ask an LLM a question via the command line and stream the response
+- Ask a range of LLMs a question via the command line and stream the response
 - Have the LLM assume a custom persona, for example Gandalf
 
-https://github.com/user-attachments/assets/268191ff-a0bb-434a-ac2a-24f84b49dc58
+https://github.com/user-attachments/assets/b56e9b90-0f71-4f92-85dc-caa7b971020a
 
-https://github.com/user-attachments/assets/5c3486e7-c54e-48c5-848e-35a42164f7aa
+- Have a conversation with a range of LLMs, again, optionally with a custom persona
+
+https://github.com/user-attachments/assets/5ccd327b-bb7f-4b6d-9fa6-0a5936c00627
 
 ## Installation:
 - Clone the repository and install the application locally
