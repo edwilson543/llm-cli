@@ -20,6 +20,10 @@ class CommandArgs:
             prompt += f" Please assume the persona of {self.persona}."
         return prompt
 
+    @property
+    def interlocutor(self) -> str:
+        return self.persona or self.model.friendly_name
+
 
 def add_model_argument(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(

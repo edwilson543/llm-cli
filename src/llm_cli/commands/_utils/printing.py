@@ -26,16 +26,18 @@ def get_llm_client_or_print_error(
 
 
 @contextlib.contextmanager
-def print_persona_response_is_from(persona: str) -> typing.Generator[None, None, None]:
+def print_block_from_interlocutor(
+    interlocutor: str,
+) -> typing.Generator[None, None, None]:
     """
-    Wrap anything printed within the context in a block formatted as below.
+    Wrap anything printed within the context in a block formatted like below.
 
     grok-2:
     ---
     {anything printed within the context}
     ---
     """
-    print(f"\n{persona}: \n---\n", end="")
+    print(f"\n{interlocutor}: \n---\n", end="")
     yield
     print("\n---\n\n", end="")
 

@@ -29,6 +29,9 @@ dependencies = [
 question = "llm_cli.commands.question:main"
 q = "llm_cli.commands.question:main"
 
+conversation = "llm_cli.commands.conversation:main"
+convo = "llm_cli.commands.conversation:main"
+
 # ----------
 # Tooling
 # ----------

@@ -31,9 +31,9 @@ async def ask_question(*, arguments: QuestionCommandArgs | None = None) -> None:
     if not client:
         return
 
-    persona = arguments.persona or arguments.model.friendly_name
-
-    with printing_utils.print_persona_response_is_from(persona=persona):
+    with printing_utils.print_block_from_interlocutor(
+        interlocutor=arguments.interlocutor
+    ):
         try:
             await printing_utils.print_response_stream_to_terminal(
                 client.stream_response(user_prompt=arguments.question)

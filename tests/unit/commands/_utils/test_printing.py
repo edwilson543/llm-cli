@@ -42,14 +42,14 @@ class TestGetLLMClientOrPrintError:
         assert output.getvalue() == expected_output
 
 
-class TestPrintPersonaResponseIsFrom:
+class TestPrintBlockFromInterlocutor:
     def test_wraps_printed_context_in_block(self):
         content = "Some content"
 
         output = io.StringIO()
         sys.stdout = output
 
-        with printing.print_persona_response_is_from(persona="Lex"):
+        with printing.print_block_from_interlocutor(interlocutor="Lex"):
             print(content, end="")
 
         assert output.getvalue() == "\nLex: \n---\nSome content\n---\n\n"
