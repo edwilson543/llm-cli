@@ -14,11 +14,6 @@ class AnthropicAPIError(_base.LLMClientError):
         return f"The API responded with status code: {self.status_code}."
 
 
-@dataclasses.dataclass(frozen=True)
-class AnthropicResponseTypeError(_base.LLMClientError):
-    type: str
-
-
 class AnthropicClient(_base.LLMClient):
     _api_key_env_var = "ANTHROPIC_API_KEY"
 
