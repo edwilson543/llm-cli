@@ -38,7 +38,7 @@ pythonpath = "./src"
 
 [tool.mypy]
 ignore_missing_imports = true
-exclude = ["venv"]
+exclude = ["venv", "build"]
 
 [[tool.mypy.overrides]]
 module = "tests.*"
