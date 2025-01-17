@@ -13,7 +13,7 @@ MAX_LINE_WIDTH = 80
 
 
 @dataclasses.dataclass(frozen=True)
-class CommandArgs(parsing_utils.CommandArgs):
+class QuestionCommandArgs(parsing_utils.CommandArgs):
     question: str
 
 
@@ -21,7 +21,7 @@ def main():
     asyncio.run(ask_question())
 
 
-async def ask_question(*, arguments: CommandArgs | None = None) -> None:
+async def ask_question(*, arguments: QuestionCommandArgs | None = None) -> None:
     """
     Command to ask the model a single question.
     """
@@ -57,7 +57,7 @@ async def ask_question(*, arguments: CommandArgs | None = None) -> None:
 async def _stream_response_and_print_formatted_output(
     *,
     client: llm_client.LLMClient,
-    arguments: CommandArgs,
+    arguments: QuestionCommandArgs,
     max_line_width: int = MAX_LINE_WIDTH,
 ) -> None:
     current_line_width = 0
@@ -80,7 +80,7 @@ async def _stream_response_and_print_formatted_output(
                 current_line_width = len(word) - final_line_break_in_word
 
 
-def _extract_args_from_cli(args: list[str]) -> CommandArgs:
+def _extract_args_from_cli(args: list[str]) -> QuestionCommandArgs:
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
@@ -93,7 +93,7 @@ def _extract_args_from_cli(args: list[str]) -> CommandArgs:
 
     parsed_args = parser.parse_args(args)
 
-    return CommandArgs(
+    return QuestionCommandArgs(
         question=parsed_args.question,
         persona=parsed_args.persona,
         model=parsing_utils.get_model_from_friendly_name(parsed_args.model),

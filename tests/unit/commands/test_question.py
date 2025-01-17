@@ -58,8 +58,8 @@ class TestStreamResponseAndPrintFormattedOutput:
         return llm_client.get_llm_client(model=llm_client.ECHO, system_prompt="fake")
 
     @staticmethod
-    def _get_arguments(response: str) -> question.CommandArgs:
-        return question.CommandArgs(
+    def _get_arguments(response: str) -> question.QuestionCommandArgs:
+        return question.QuestionCommandArgs(
             question=response, persona=None, model=llm_client.ECHO
         )
 

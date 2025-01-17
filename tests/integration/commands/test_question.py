@@ -13,10 +13,8 @@ async def test_asks_question_to_echo_model_and_gets_response():
     output = io.StringIO()
     sys.stdout = output
 
-    arguments = question.CommandArgs(
-        question="What is your speciality?",
-        model=llm_client.ECHO,
-        persona="Eva Perón",
+    arguments = question.QuestionCommandArgs(
+        question="What is your speciality?", model=llm_client.ECHO, persona="Eva Perón"
     )
 
     await question.ask_question(arguments=arguments)
@@ -33,7 +31,7 @@ async def test_handles_error_when_api_key_is_not_set(mock_env_vars: mock.Mock):
     output = io.StringIO()
     sys.stdout = output
 
-    arguments = question.CommandArgs(
+    arguments = question.QuestionCommandArgs(
         question="Do you have any regrets?",
         model=llm_client.GROK_2,
         persona=None,
@@ -51,10 +49,8 @@ async def test_handles_error_raised_while_streaming_response_from_client():
     output = io.StringIO()
     sys.stdout = output
 
-    arguments = question.CommandArgs(
-        question="What is your speciality?",
-        model=llm_client.BROKEN,
-        persona=None,
+    arguments = question.QuestionCommandArgs(
+        question="What is your speciality?", model=llm_client.BROKEN, persona=None
     )
 
     await question.ask_question(arguments=arguments)
