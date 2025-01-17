@@ -9,8 +9,10 @@ class EchoClient(_base.LLMClient):
     Return the prompt as the response message - an echo.
     """
 
-    async def stream_response(
-        self, *, user_prompt: str, system_prompt: str
+    async def _stream_response(
+        self, *, system_prompt: str
     ) -> AsyncGenerator[str, None]:
-        for word in re.split(r"(\s+)", user_prompt):
+        latest_user_message = self._messages[-1]["content"]
+
+        for word in re.split(r"(\s+)", latest_user_message):
             yield word
