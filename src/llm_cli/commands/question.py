@@ -3,7 +3,6 @@ import asyncio
 import dataclasses
 import re
 import sys
-import textwrap
 
 from llm_cli.domain import llm_client
 
@@ -16,7 +15,6 @@ class CommandArgs:
     question: str
     persona: str | None
     model: llm_client.Model
-    stream: bool
 
 
 def main():
@@ -32,48 +30,36 @@ async def ask_question(*, arguments: CommandArgs | None = None) -> None:
     if arguments is None:
         arguments = _extract_args_from_cli(sys.argv[1:])
 
-    client = llm_client.get_llm_client(model=arguments.model)
+    try:
+        client = llm_client.get_llm_client(model=arguments.model)
+    except llm_client.APIKeyNotSet as exc:
+        _set_print_colour_to_yellow()
+        print(
+            f"The {exc.env_var} environment variable must be set to use {arguments.model.vendor.value}'s models!"
+        )
+        return
 
     persona = arguments.persona or arguments.model.friendly_name
     print(f"\n{persona}:\n---\n", end="")
 
-    if arguments.stream:
-        await _ask_question_async(client=client, arguments=arguments)
-    else:
-        _ask_question_sync(client=client, arguments=arguments)
+    try:
+        await _stream_response_and_print_formatted_output(
+            client=client, arguments=arguments
+        )
+    except llm_client.LLMClientError as exc:
+        print("Error streaming response.", exc, end="")
 
     print("\n---\n")
 
 
-def _ask_question_sync(*, client: llm_client.LLMClient, arguments: CommandArgs) -> None:
-    try:
-        response_message = client.get_response(
-            user_prompt=arguments.question, persona=arguments.persona
-        )
-    except llm_client.LLMClientError as exc:
-        response_message = (
-            f"Unable to get a response from '{arguments.model.vendor.value}'. "
-            + str(exc)
-        )
-        print(response_message, end="")
-        return
-
-    print(textwrap.fill(response_message, MAX_LINE_WIDTH), end="")
-
-
-async def _ask_question_async(
+async def _stream_response_and_print_formatted_output(
     *, client: llm_client.LLMClient, arguments: CommandArgs
 ) -> None:
-    try:
-        response = client.get_response_async(
-            user_prompt=arguments.question, persona=arguments.persona
-        )
-    except llm_client.LLMClientError as exc:
-        print(str(exc))
-        raise
-
     current_width = 0
-    async for response_message in response:
+
+    async for response_message in client.get_response_async(
+        user_prompt=arguments.question, persona=arguments.persona
+    ):
         for word in re.split(r"(\s+)", response_message):
             if len(word) + current_width < MAX_LINE_WIDTH:
                 print(word, end="", flush=True)
@@ -83,7 +69,7 @@ async def _ask_question_async(
                 current_width = len(word)
 
             if (last_line_break := word.rfind("\n")) > 0:
-                current_width = last_line_break
+                current_width = len(word) - last_line_break
 
 
 def _extract_args_from_cli(args: list[str]) -> CommandArgs:
@@ -109,12 +95,6 @@ def _extract_args_from_cli(args: list[str]) -> CommandArgs:
         default=llm_client.get_default_model().friendly_name,
         help="The model that should be used.",
     )
-    parser.add_argument(
-        "-s",
-        "--stream",
-        action="store_true",
-        help="Whether to stream the response from the model asynchronously.",
-    )
 
     parsed_args = parser.parse_args(args)
 
@@ -122,7 +102,6 @@ def _extract_args_from_cli(args: list[str]) -> CommandArgs:
         question=parsed_args.question,
         persona=parsed_args.persona,
         model=_get_model_from_friendly_name(parsed_args.model),
-        stream=parsed_args.stream,
     )
 
 
@@ -134,4 +113,9 @@ def _get_model_from_friendly_name(friendly_name: str) -> llm_client.Model:
 
 def _set_print_colour_to_cyan() -> None:
     cyan = "\033[96m"
+    print(cyan, end="")
+
+
+def _set_print_colour_to_yellow() -> None:
+    cyan = "\033[93m"
     print(cyan, end="")

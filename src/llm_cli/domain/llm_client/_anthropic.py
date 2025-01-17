@@ -2,7 +2,6 @@ import dataclasses
 from collections.abc import AsyncGenerator
 
 import anthropic
-from anthropic import types as anthropic_types
 
 from llm_cli.domain.llm_client import _base, _models
 
@@ -41,26 +40,6 @@ class AnthropicClient(_base.LLMClient):
         self._max_tokens = 1024
 
         self._system_prompt = "Please be as succinct as possible in your answer. "
-
-    def get_response(self, *, user_prompt: str, persona: str | None = None) -> str:
-        if persona:
-            self._add_persona_to_system_prompt(persona=persona)
-
-        try:
-            message = self._client.messages.create(
-                model=self._model,
-                max_tokens=self._max_tokens,
-                system=self._system_prompt,
-                messages=[{"role": "user", "content": user_prompt}],
-            )
-        except anthropic.APIStatusError as exc:
-            raise AnthropicAPIError(status_code=exc.status_code)
-
-        response = message.content[0]
-        if not isinstance(response, anthropic_types.TextBlock):
-            raise AnthropicResponseTypeError(type=str(type(response)))
-
-        return response.text
 
     async def get_response_async(
         self, *, user_prompt: str, persona: str | None = None
