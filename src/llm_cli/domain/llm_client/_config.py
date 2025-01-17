@@ -13,18 +13,18 @@ class ModelNotConfigured(_base.LLMClientError):
         return f"No LLMClient implementation is installed for model '{self.model.official_name}'."
 
 
-def get_llm_client(*, model: _models.Model) -> _base.LLMClient:
+def get_llm_client(*, model: _models.Model, system_prompt: str) -> _base.LLMClient:
     """
     Return an LLMClient instance that integrates with the specified model.
     """
     if model.vendor == _models.Vendor.ANTHROPIC:
-        return _anthropic.AnthropicClient(model=model)
+        return _anthropic.AnthropicClient(model=model, system_prompt=system_prompt)
     elif model.vendor == _models.Vendor.XAI:
-        return _xai.XAIClient(model=model)
+        return _xai.XAIClient(model=model, system_prompt=system_prompt)
     elif model.friendly_name == "echo":
-        return _echo.EchoClient()
+        return _echo.EchoClient(system_prompt=system_prompt)
     elif model.friendly_name == "broken":
-        return _broken.BrokenClient()
+        return _broken.BrokenClient(system_prompt=system_prompt)
     raise ModelNotConfigured(model=model)
 
 

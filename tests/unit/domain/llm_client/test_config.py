@@ -13,31 +13,35 @@ class TestGetLLMClient:
     ):
         claude_sonnet = _models.CLAUDE_SONNET
 
-        client = _config.get_llm_client(model=claude_sonnet)
+        client = _config.get_llm_client(model=claude_sonnet, system_prompt="fake")
 
         assert isinstance(client, _anthropic.AnthropicClient)
         assert client._model == claude_sonnet.official_name
+        assert client._system_prompt == "fake"
         mock_env_vars.assert_called_once_with("ANTHROPIC_API_KEY")
 
     @mock.patch.object(_config.env, "as_str", return_value="something")
     def test_gets_xai_client_for_grok_2_model(self, mock_env_vars: mock.Mock):
         grok_2 = _models.GROK_2
 
-        client = _config.get_llm_client(model=grok_2)
+        client = _config.get_llm_client(model=grok_2, system_prompt="fake")
 
         assert isinstance(client, _xai.XAIClient)
         assert client._model == grok_2.official_name
+        assert client._system_prompt == "fake"
         mock_env_vars.assert_called_once_with("XAI_API_KEY")
 
     def test_gets_echo_client(self):
-        client = _config.get_llm_client(model=_models.ECHO)
+        client = _config.get_llm_client(model=_models.ECHO, system_prompt="fake")
 
         assert isinstance(client, _echo.EchoClient)
+        assert client._system_prompt == "fake"
 
     def test_gets_broken_client(self):
-        client = _config.get_llm_client(model=_models.BROKEN)
+        client = _config.get_llm_client(model=_models.BROKEN, system_prompt="fake")
 
         assert isinstance(client, _broken.BrokenClient)
+        assert client._system_prompt == "fake"
 
     def test_raises_when_model_not_configured(self):
         not_configured_model = _models.Model(
@@ -47,7 +51,7 @@ class TestGetLLMClient:
         )
 
         with pytest.raises(_config.ModelNotConfigured) as exc:
-            _config.get_llm_client(model=not_configured_model)
+            _config.get_llm_client(model=not_configured_model, system_prompt="fake")
 
         assert exc.value.model == not_configured_model
         expected_exc_message = (

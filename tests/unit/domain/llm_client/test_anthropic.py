@@ -9,7 +9,7 @@ class TestGetResponseAsync:
     async def test_parses_and_returns_response_when_configured_correctly(
         self, httpx_mock: pytest_httpx.HTTPXMock
     ):
-        client = _anthropic.AnthropicClient(api_key="fake-key")
+        client = _anthropic.AnthropicClient(api_key="fake-key", system_prompt="fake")
 
         httpx_mock.add_response(
             url="https://api.anthropic.com/v1/messages",
@@ -19,9 +19,7 @@ class TestGetResponseAsync:
             is_reusable=True,
         )
 
-        result = client.stream_response(
-            user_prompt="Tell me about your constitution.", system_prompt=""
-        )
+        result = client.stream_response(user_prompt="Tell me about your constitution.")
 
         response = "".join([text async for text in result])
         assert response == "I have no idea!"
@@ -30,7 +28,7 @@ class TestGetResponseAsync:
     async def test_raises_when_fails_to_authenticate(
         self, httpx_mock: pytest_httpx.HTTPXMock
     ):
-        client = _anthropic.AnthropicClient(api_key="fake-key")
+        client = _anthropic.AnthropicClient(api_key="fake-key", system_prompt="fake")
 
         httpx_mock.add_response(
             url="https://api.anthropic.com/v1/messages",
@@ -42,8 +40,7 @@ class TestGetResponseAsync:
 
         with pytest.raises(_anthropic.AnthropicAPIError) as exc:
             async for _ in client.stream_response(
-                user_prompt="Tell me about your constitution.",
-                system_prompt="",
+                user_prompt="Tell me about your constitution."
             ):
                 pass
 

@@ -10,10 +10,7 @@ class TestGetResponseAsync:
         user_prompt = "Can you hear the echo?"
 
         response = [
-            chunk
-            async for chunk in client.stream_response(
-                user_prompt=user_prompt, system_prompt=""
-            )
+            chunk async for chunk in client.stream_response(user_prompt=user_prompt)
         ]
 
         assert "".join(chunk for chunk in response) == user_prompt

@@ -1,91 +1,48 @@
 import argparse
 import asyncio
 import dataclasses
-import re
 import sys
 
 from llm_cli.domain import llm_client
 
-
-MAX_LINE_WIDTH = 80
+from ._utils import parsing as parsing_utils
+from ._utils import printing as printing_utils
 
 
 @dataclasses.dataclass(frozen=True)
-class CommandArgs:
+class QuestionCommandArgs(parsing_utils.CommandArgs):
     question: str
-    persona: str | None
-    model: llm_client.Model
-
-    @property
-    def system_prompt(self) -> str:
-        prompt = "Please be as succinct as possible in your answer. "
-        if self.persona:
-            prompt += f"Please assume the persona of {self.persona}."
-        return prompt
 
 
 def main():
     asyncio.run(ask_question())
 
 
-async def ask_question(*, arguments: CommandArgs | None = None) -> None:
+async def ask_question(*, arguments: QuestionCommandArgs | None = None) -> None:
     """
-    Command to ask the model a single question.
+    Command to ask a single question to a model.
     """
-    _set_print_colour_to_cyan()
+    printing_utils.set_print_colour_to_cyan()
 
     if arguments is None:
         arguments = _extract_args_from_cli(sys.argv[1:])
 
-    try:
-        client = llm_client.get_llm_client(model=arguments.model)
-    except llm_client.APIKeyNotSet as exc:
-        _set_print_colour_to_yellow()
-        print(
-            f"The {exc.env_var} environment variable must be set to use {arguments.model.vendor.value}'s models!"
-        )
+    client = printing_utils.get_llm_client_or_print_error(arguments=arguments)
+    if not client:
         return
 
-    persona = arguments.persona or arguments.model.friendly_name
-    print(f"\n{persona}:\n---\n", end="")
-
-    try:
-        await _stream_response_and_print_formatted_output(
-            client=client, arguments=arguments
-        )
-    except llm_client.LLMClientError as exc:
-        print("Error streaming response.", exc, end="")
-
-    print("\n---\n")
-
-
-async def _stream_response_and_print_formatted_output(
-    *,
-    client: llm_client.LLMClient,
-    arguments: CommandArgs,
-    max_line_width: int = MAX_LINE_WIDTH,
-) -> None:
-    current_line_width = 0
-
-    async for response_message in client.stream_response(
-        user_prompt=arguments.question, system_prompt=arguments.system_prompt
+    with printing_utils.print_block_from_interlocutor(
+        interlocutor=arguments.interlocutor
     ):
-        words_with_spaces = re.split(r"(\s+)", response_message)
-
-        for word in words_with_spaces:
-            if len(word) + current_line_width <= max_line_width:
-                print(word, end="", flush=True)
-                current_line_width += len(word)
-            else:
-                print("\n", word.lstrip(), sep="", end="", flush=True)
-                current_line_width = len(word)
-
-            final_line_break_in_word = word.rfind("\n")
-            if final_line_break_in_word > 0:
-                current_line_width = len(word) - final_line_break_in_word
+        try:
+            await printing_utils.print_response_stream_to_terminal(
+                client.stream_response(user_prompt=arguments.question)
+            )
+        except llm_client.LLMClientError as exc:
+            print("Error streaming response.", exc, end="")
 
 
-def _extract_args_from_cli(args: list[str]) -> CommandArgs:
+def _extract_args_from_cli(args: list[str]) -> QuestionCommandArgs:
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
@@ -93,42 +50,13 @@ def _extract_args_from_cli(args: list[str]) -> CommandArgs:
         type=str,
         help="The question the model should answer.",
     )
-    parser.add_argument(
-        "-p",
-        "--persona",
-        type=str,
-        required=False,
-        help="The persona the model should assume.",
-    )
-    parser.add_argument(
-        "-m",
-        "--model",
-        type=str,
-        choices=[model.friendly_name for model in llm_client.get_available_models()],
-        default=llm_client.get_default_model().friendly_name,
-        help="The model that should be used.",
-    )
+    parsing_utils.add_model_argument(parser)
+    parsing_utils.add_persona_argument(parser)
 
     parsed_args = parser.parse_args(args)
 
-    return CommandArgs(
+    return QuestionCommandArgs(
         question=parsed_args.question,
         persona=parsed_args.persona,
-        model=_get_model_from_friendly_name(parsed_args.model),
+        model=parsing_utils.get_model_from_friendly_name(parsed_args.model),
     )
-
-
-def _get_model_from_friendly_name(friendly_name: str) -> llm_client.Model:
-    for model in llm_client.get_available_models():
-        if model.friendly_name == friendly_name:
-            return model
-
-
-def _set_print_colour_to_cyan() -> None:
-    cyan = "\033[96m"
-    print(cyan, end="")
-
-
-def _set_print_colour_to_yellow() -> None:
-    cyan = "\033[93m"
-    print(cyan, end="")

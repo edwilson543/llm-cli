@@ -13,9 +13,10 @@ class BrokenClient(_base.LLMClient):
     Raise an exception whenever any method is called.
     """
 
-    async def stream_response(
-        self, *, user_prompt: str, system_prompt: str
-    ) -> AsyncGenerator[str, None]:
+    def __init__(self, system_prompt: str = "Be broken."):
+        super().__init__(system_prompt=system_prompt)
+
+    async def _stream_response(self) -> AsyncGenerator[str, None]:
         for _ in range(0, 1):
             yield ""
         raise BrokenClientError()

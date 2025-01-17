@@ -19,30 +19,29 @@ class AnthropicClient(_base.LLMClient):
 
     def __init__(
         self,
+        *,
+        system_prompt: str,
         api_key: str | None = None,
         base_url: str | None = None,
         model: _models.Model | None = None,
     ) -> None:
-        super().__init__()
+        super().__init__(system_prompt=system_prompt)
 
         api_key = self._get_api_key(api_key=api_key)
 
-        self._client = anthropic.Client(api_key=api_key, base_url=base_url)
         self._async_client = anthropic.AsyncClient(api_key=api_key, base_url=base_url)
         self._model = (
             model.official_name if model else _models.CLAUDE_SONNET.official_name
         )
         self._max_tokens = 1024
 
-    async def stream_response(
-        self, *, user_prompt: str, system_prompt: str
-    ) -> AsyncGenerator[str, None]:
+    async def _stream_response(self) -> AsyncGenerator[str, None]:
         try:
             async with self._async_client.messages.stream(
                 model=self._model,
                 max_tokens=self._max_tokens,
-                system=system_prompt,
-                messages=[{"role": "user", "content": user_prompt}],
+                system=self._system_prompt,
+                messages=self._messages,
             ) as stream:
                 async for text in stream.text_stream:
                     yield text
