@@ -9,6 +9,7 @@ class CommandArgs:
     """
     Base class for command arguments shared by all commands.
     """
+
     persona: str | None
     model: llm_client.Model
 
@@ -19,6 +20,7 @@ class CommandArgs:
             prompt += f" Please assume the persona of {self.persona}."
         return prompt
 
+
 def add_model_argument(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "-m",
@@ -28,6 +30,7 @@ def add_model_argument(parser: argparse.ArgumentParser) -> None:
         default=llm_client.get_default_model().friendly_name,
         help="The model that should be used.",
     )
+
 
 def add_persona_argument(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(

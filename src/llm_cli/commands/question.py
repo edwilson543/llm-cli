@@ -1,15 +1,12 @@
 import argparse
 import asyncio
 import dataclasses
-import re
 import sys
 
 from llm_cli.domain import llm_client
 
 from ._utils import parsing as parsing_utils
-
-
-MAX_LINE_WIDTH = 80
+from ._utils import printing as printing_utils
 
 
 @dataclasses.dataclass(frozen=True)
@@ -23,61 +20,26 @@ def main():
 
 async def ask_question(*, arguments: QuestionCommandArgs | None = None) -> None:
     """
-    Command to ask the model a single question.
+    Command to ask a single question to a model.
     """
-    _set_print_colour_to_cyan()
+    printing_utils.set_print_colour_to_cyan()
 
     if arguments is None:
         arguments = _extract_args_from_cli(sys.argv[1:])
 
-    try:
-        client = llm_client.get_llm_client(
-            model=arguments.model, system_prompt=arguments.system_prompt
-        )
-    except llm_client.APIKeyNotSet as exc:
-        _set_print_colour_to_yellow()
-        print(
-            f"The {exc.env_var} environment variable must be set to use {arguments.model.vendor.value}'s models!"
-        )
+    client = printing_utils.get_llm_client_or_print_error(arguments=arguments)
+    if not client:
         return
 
     persona = arguments.persona or arguments.model.friendly_name
-    print(f"\n{persona}:\n---\n", end="")
 
-    try:
-        await _stream_response_and_print_formatted_output(
-            client=client, arguments=arguments
-        )
-    except llm_client.LLMClientError as exc:
-        print("Error streaming response.", exc, end="")
-
-    print("\n---\n")
-
-
-async def _stream_response_and_print_formatted_output(
-    *,
-    client: llm_client.LLMClient,
-    arguments: QuestionCommandArgs,
-    max_line_width: int = MAX_LINE_WIDTH,
-) -> None:
-    current_line_width = 0
-
-    async for response_message in client.stream_response(
-        user_prompt=arguments.question
-    ):
-        words_with_spaces = re.split(r"(\s+)", response_message)
-
-        for word in words_with_spaces:
-            if len(word) + current_line_width <= max_line_width:
-                print(word, end="", flush=True)
-                current_line_width += len(word)
-            else:
-                print("\n", word.lstrip(), sep="", end="", flush=True)
-                current_line_width = len(word)
-
-            final_line_break_in_word = word.rfind("\n")
-            if final_line_break_in_word > 0:
-                current_line_width = len(word) - final_line_break_in_word
+    with printing_utils.print_persona_response_is_from(persona=persona):
+        try:
+            await printing_utils.print_response_stream_to_terminal(
+                client.stream_response(user_prompt=arguments.question)
+            )
+        except llm_client.LLMClientError as exc:
+            print("Error streaming response.", exc, end="")
 
 
 def _extract_args_from_cli(args: list[str]) -> QuestionCommandArgs:
@@ -98,13 +60,3 @@ def _extract_args_from_cli(args: list[str]) -> QuestionCommandArgs:
         persona=parsed_args.persona,
         model=parsing_utils.get_model_from_friendly_name(parsed_args.model),
     )
-
-
-def _set_print_colour_to_cyan() -> None:
-    cyan = "\033[96m"
-    print(cyan, end="")
-
-
-def _set_print_colour_to_yellow() -> None:
-    cyan = "\033[93m"
-    print(cyan, end="")

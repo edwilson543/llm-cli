@@ -1,67 +1,6 @@
-import io
-import sys
-
 import pytest
 
 from llm_cli.commands import question
-from llm_cli.domain import llm_client
-
-
-class TestStreamResponseAndPrintFormattedOutput:
-    @pytest.mark.asyncio
-    async def test_prints_response_on_single_line(self):
-        client = self._get_echo_client()
-        response = "This can all fit on one line."
-        arguments = self._get_arguments(response=response)
-
-        output = io.StringIO()
-        sys.stdout = output
-
-        await question._stream_response_and_print_formatted_output(
-            client=client, arguments=arguments, max_line_width=len(response) + 1
-        )
-
-        assert output.getvalue() == response
-
-    @pytest.mark.asyncio
-    async def test_prints_response_wrapped_over_three_lines(self):
-        client = self._get_echo_client()
-        response = "This does not all fit on one line."
-        arguments = self._get_arguments(response=response)
-
-        output = io.StringIO()
-        sys.stdout = output
-
-        await question._stream_response_and_print_formatted_output(
-            client=client, arguments=arguments, max_line_width=9
-        )
-
-        assert output.getvalue() == "This does\nnot all \nfit on \none line."
-
-    @pytest.mark.asyncio
-    async def test_resets_current_line_width_when_response_includes_line_break(self):
-        client = self._get_echo_client()
-        response = "This \nis some multi line text. Thanks!"
-        arguments = self._get_arguments(response=response)
-
-        output = io.StringIO()
-        sys.stdout = output
-
-        await question._stream_response_and_print_formatted_output(
-            client=client, arguments=arguments, max_line_width=13
-        )
-
-        assert output.getvalue() == "This \nis some \nmulti line \ntext. Thanks!"
-
-    @staticmethod
-    def _get_echo_client() -> llm_client.LLMClient:
-        return llm_client.get_llm_client(model=llm_client.ECHO, system_prompt="fake")
-
-    @staticmethod
-    def _get_arguments(response: str) -> question.QuestionCommandArgs:
-        return question.QuestionCommandArgs(
-            question=response, persona=None, model=llm_client.ECHO
-        )
 
 
 class TestExtractArgsFromCli:
