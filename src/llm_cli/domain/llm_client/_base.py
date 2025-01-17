@@ -27,13 +27,11 @@ class Message(typing.TypedDict):
 class LLMClient(abc.ABC):
     _api_key_env_var: str | None = None
 
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, *, system_prompt: str) -> None:
+        self._system_prompt = system_prompt
         self._messages: list[Message] = []
 
-    async def stream_response(
-        self, *, user_prompt: str, system_prompt: str
-    ) -> AsyncGenerator[str, None]:
+    async def stream_response(self, *, user_prompt: str) -> AsyncGenerator[str, None]:
         """
         Wrapper for the client-specific streaming logic.
 
@@ -43,7 +41,7 @@ class LLMClient(abc.ABC):
         self._append_user_message(user_prompt)
         chunks: list[str] = []
 
-        async for text in self._stream_response(system_prompt=system_prompt):
+        async for text in self._stream_response():
             chunks.append(text)
             yield text
 
@@ -53,7 +51,7 @@ class LLMClient(abc.ABC):
     # Private interface.
 
     @abc.abstractmethod
-    def _stream_response(self, *, system_prompt: str) -> AsyncGenerator[str, None]:
+    def _stream_response(self) -> AsyncGenerator[str, None]:
         """
         Stream the next response in the conversation stored in `self._messages`.
         """

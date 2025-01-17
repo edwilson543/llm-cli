@@ -38,7 +38,9 @@ async def ask_question(*, arguments: CommandArgs | None = None) -> None:
         arguments = _extract_args_from_cli(sys.argv[1:])
 
     try:
-        client = llm_client.get_llm_client(model=arguments.model)
+        client = llm_client.get_llm_client(
+            model=arguments.model, system_prompt=arguments.system_prompt
+        )
     except llm_client.APIKeyNotSet as exc:
         _set_print_colour_to_yellow()
         print(
@@ -68,7 +70,7 @@ async def _stream_response_and_print_formatted_output(
     current_line_width = 0
 
     async for response_message in client.stream_response(
-        user_prompt=arguments.question, system_prompt=arguments.system_prompt
+        user_prompt=arguments.question
     ):
         words_with_spaces = re.split(r"(\s+)", response_message)
 
