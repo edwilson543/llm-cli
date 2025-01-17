@@ -11,7 +11,7 @@ class AnthropicAPIError(_base.LLMClientError):
     status_code: int
 
     def __str__(self) -> str:
-        return f"Unable to get a response. The Anthropic API responded with status code: {self.status_code}."
+        return f"The API responded with status code: {self.status_code}."
 
 
 @dataclasses.dataclass(frozen=True)
