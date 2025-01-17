@@ -6,22 +6,15 @@ import sys
 
 from llm_cli.domain import llm_client
 
+from ._utils import parsing as parsing_utils
+
 
 MAX_LINE_WIDTH = 80
 
 
 @dataclasses.dataclass(frozen=True)
-class CommandArgs:
+class CommandArgs(parsing_utils.CommandArgs):
     question: str
-    persona: str | None
-    model: llm_client.Model
-
-    @property
-    def system_prompt(self) -> str:
-        prompt = "Please be as succinct as possible in your answer. "
-        if self.persona:
-            prompt += f"Please assume the persona of {self.persona}."
-        return prompt
 
 
 def main():
@@ -95,35 +88,16 @@ def _extract_args_from_cli(args: list[str]) -> CommandArgs:
         type=str,
         help="The question the model should answer.",
     )
-    parser.add_argument(
-        "-p",
-        "--persona",
-        type=str,
-        required=False,
-        help="The persona the model should assume.",
-    )
-    parser.add_argument(
-        "-m",
-        "--model",
-        type=str,
-        choices=[model.friendly_name for model in llm_client.get_available_models()],
-        default=llm_client.get_default_model().friendly_name,
-        help="The model that should be used.",
-    )
+    parsing_utils.add_model_argument(parser)
+    parsing_utils.add_persona_argument(parser)
 
     parsed_args = parser.parse_args(args)
 
     return CommandArgs(
         question=parsed_args.question,
         persona=parsed_args.persona,
-        model=_get_model_from_friendly_name(parsed_args.model),
+        model=parsing_utils.get_model_from_friendly_name(parsed_args.model),
     )
-
-
-def _get_model_from_friendly_name(friendly_name: str) -> llm_client.Model:
-    for model in llm_client.get_available_models():
-        if model.friendly_name == friendly_name:
-            return model
 
 
 def _set_print_colour_to_cyan() -> None:
