@@ -1,6 +1,7 @@
 TODO.txt
 .env*
 venv
+/build
 
 .idea
 *__pycache__

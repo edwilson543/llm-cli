@@ -2,11 +2,12 @@ from unittest import mock
 
 import pytest
 
+from llm_cli import env
 from llm_cli.domain.llm_client import _anthropic, _broken, _config, _echo, _models, _xai
 
 
 class TestGetLLMClient:
-    @mock.patch("llm_cli.env.as_str", return_value="something")
+    @mock.patch.object(_config.env, "as_str", return_value="something")
     def test_gets_anthropic_client_for_claude_sonnet_model(
         self, mock_env_vars: mock.Mock
     ):
@@ -18,7 +19,7 @@ class TestGetLLMClient:
         assert client._model == claude_sonnet.official_name
         mock_env_vars.assert_called_once_with("ANTHROPIC_API_KEY")
 
-    @mock.patch("llm_cli.env.as_str", return_value="something")
+    @mock.patch.object(_config.env, "as_str", return_value="something")
     def test_gets_xai_client_for_grok_2_model(self, mock_env_vars: mock.Mock):
         grok_2 = _models.GROK_2
 
@@ -53,3 +54,32 @@ class TestGetLLMClient:
             "No LLMClient implementation is installed for model 'not-configured'."
         )
         assert str(exc.value) == expected_exc_message
+
+
+class TestGetDefaultModel:
+    @mock.patch.object(_config.env, "as_str", return_value="grok-2")
+    def test_gets_default_model_when_set_via_env_var(self, mock_env_vars: mock.Mock):
+        default_model = _config.get_default_model()
+
+        assert default_model == _models.GROK_2
+        mock_env_vars.assert_called_once_with("DEFAULT_MODEL")
+
+    @mock.patch.object(
+        _config.env,
+        "as_str",
+        side_effect=env.EnvironmentVariableNotSet(key="DEFAULT_MODEL"),
+    )
+    def test_gets_claude_sonnet_when_env_var_not_set(self, mock_env_vars: mock.Mock):
+        default_model = _config.get_default_model()
+
+        assert default_model == _models.CLAUDE_SONNET
+        mock_env_vars.assert_called_once_with("DEFAULT_MODEL")
+
+    @mock.patch.object(_config.env, "as_str", return_value="deep-fake")
+    def test_gets_claude_sonnet_when_default_model_not_recognised(
+        self, mock_env_vars: mock.Mock
+    ):
+        default_model = _config.get_default_model()
+
+        assert default_model == _models.CLAUDE_SONNET
+        mock_env_vars.assert_called_once_with("DEFAULT_MODEL")

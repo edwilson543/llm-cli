@@ -40,8 +40,16 @@ def get_available_models() -> list[_models.Model]:
 
 
 def get_default_model() -> _models.Model:
-    default_model = env.as_str("DEFAULT_MODEL")
+    """
+    Get the model to use by default.
+    """
+    try:
+        default_model = env.as_str("DEFAULT_MODEL")
+    except env.EnvironmentVariableNotSet:
+        return _models.CLAUDE_SONNET
+
     for model in get_available_models():
         if model.friendly_name == default_model:
             return model
+
     return _models.CLAUDE_SONNET

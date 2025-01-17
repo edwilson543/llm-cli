@@ -28,6 +28,12 @@ nano .env
 question 'Have I setup the application correctly?'
 ```
 
+- To install the CLI system-wide
+```bash
+brew install pipx # If necessary.
+pipx install -e .
+```
+
 ## Supported models:
 - Claude {Haiku, Sonnet, Opus}
 - Grok 2
