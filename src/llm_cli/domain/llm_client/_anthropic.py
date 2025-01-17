@@ -37,14 +37,22 @@ class AnthropicClient(_base.LLMClient):
     async def stream_response(
         self, *, user_prompt: str, system_prompt: str
     ) -> AsyncGenerator[str, None]:
+        self._append_user_message(user_prompt)
+
+        chunks: list[str] = []
+
         try:
             async with self._async_client.messages.stream(
                 model=self._model,
                 max_tokens=self._max_tokens,
                 system=system_prompt,
-                messages=[{"role": "user", "content": user_prompt}],
+                messages=self._messages,
             ) as stream:
                 async for text in stream.text_stream:
+                    chunks.append(text)
                     yield text
         except anthropic.APIStatusError as exc:
             raise AnthropicAPIError(status_code=exc.status_code)
+
+        assistant_message = "".join(chunk for chunk in chunks)
+        self._append_assistant_message(assistant_message)

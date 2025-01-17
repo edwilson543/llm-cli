@@ -1,5 +1,6 @@
 import abc
 import dataclasses
+import typing
 from collections.abc import AsyncGenerator
 
 from llm_cli import env
@@ -18,14 +19,29 @@ class APIKeyNotSet(LLMClientError):
         return f"The '{self.env_var}' environment variable is not set."
 
 
+class Message(typing.TypedDict):
+    role: typing.Literal["user"] | typing.Literal["assistant"]
+    content: str
+
+
 class LLMClient(abc.ABC):
     _api_key_env_var: str | None = None
+
+    def __init__(self) -> None:
+        super().__init__()
+        self._messages: list[Message] = []
 
     @abc.abstractmethod
     async def stream_response(
         self, *, user_prompt: str, system_prompt: str
     ) -> AsyncGenerator[str, None]:
         raise NotImplementedError
+
+    def _append_user_message(self, message: str) -> None:
+        self._messages.append({"role": "user", "content": message})
+
+    def _append_assistant_message(self, message: str) -> None:
+        self._messages.append({"role": "assistant", "content": message})
 
     def _get_api_key(self, api_key: str | None = None) -> str:
         if api_key:
