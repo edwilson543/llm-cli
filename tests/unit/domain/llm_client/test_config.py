@@ -3,7 +3,9 @@ from unittest import mock
 import pytest
 
 from llm_cli import env
-from llm_cli.domain.llm_client import _anthropic, _broken, _config, _echo, _models, _xai
+from llm_cli.domain.llm_client import _config, _models
+from llm_cli.domain.llm_client._fakes import broken, echo
+from llm_cli.domain.llm_client._vendors import anthropic, xai
 
 
 class TestGetLLMClient:
@@ -15,7 +17,7 @@ class TestGetLLMClient:
 
         client = _config.get_llm_client(model=claude_sonnet, system_prompt="fake")
 
-        assert isinstance(client, _anthropic.AnthropicClient)
+        assert isinstance(client, anthropic.AnthropicClient)
         assert client._model == claude_sonnet.official_name
         assert client._system_prompt == "fake"
         mock_env_vars.assert_called_once_with("ANTHROPIC_API_KEY")
@@ -26,7 +28,7 @@ class TestGetLLMClient:
 
         client = _config.get_llm_client(model=grok_2, system_prompt="fake")
 
-        assert isinstance(client, _xai.XAIClient)
+        assert isinstance(client, xai.XAIClient)
         assert client._model == grok_2.official_name
         assert client._system_prompt == "fake"
         mock_env_vars.assert_called_once_with("XAI_API_KEY")
@@ -34,13 +36,13 @@ class TestGetLLMClient:
     def test_gets_echo_client(self):
         client = _config.get_llm_client(model=_models.ECHO, system_prompt="fake")
 
-        assert isinstance(client, _echo.EchoClient)
+        assert isinstance(client, echo.EchoClient)
         assert client._system_prompt == "fake"
 
     def test_gets_broken_client(self):
         client = _config.get_llm_client(model=_models.BROKEN, system_prompt="fake")
 
-        assert isinstance(client, _broken.BrokenClient)
+        assert isinstance(client, broken.BrokenClient)
         assert client._system_prompt == "fake"
 
     def test_raises_when_model_not_configured(self):

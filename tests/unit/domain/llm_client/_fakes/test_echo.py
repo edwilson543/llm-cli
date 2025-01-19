@@ -1,12 +1,12 @@
 import pytest
 
-from llm_cli.domain.llm_client import _echo
+from llm_cli.domain.llm_client._fakes import echo
 
 
 class TestGetResponseAsync:
     @pytest.mark.asyncio
     async def test_returns_user_prompt(self):
-        client = _echo.EchoClient()
+        client = echo.EchoClient()
         user_prompt = "Can you hear the echo?"
 
         response = [

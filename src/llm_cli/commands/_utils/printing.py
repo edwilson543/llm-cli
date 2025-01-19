@@ -80,6 +80,7 @@ def set_print_colour_to_green() -> None:
     cyan = "\033[92m"
     print(cyan, end="")
 
+
 def set_print_colour_to_cyan() -> None:
     cyan = "\033[96m"
     print(cyan, end="")

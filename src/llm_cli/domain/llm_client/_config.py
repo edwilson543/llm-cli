@@ -2,7 +2,9 @@ import dataclasses
 
 from llm_cli import env
 
-from . import _anthropic, _base, _broken, _echo, _models, _xai
+from . import _base, _models
+from ._fakes import broken, echo
+from ._vendors import anthropic, xai
 
 
 @dataclasses.dataclass(frozen=True)
@@ -18,13 +20,13 @@ def get_llm_client(*, model: _models.Model, system_prompt: str) -> _base.LLMClie
     Return an LLMClient instance that integrates with the specified model.
     """
     if model.vendor == _models.Vendor.ANTHROPIC:
-        return _anthropic.AnthropicClient(model=model, system_prompt=system_prompt)
+        return anthropic.AnthropicClient(model=model, system_prompt=system_prompt)
     elif model.vendor == _models.Vendor.XAI:
-        return _xai.XAIClient(model=model, system_prompt=system_prompt)
+        return xai.XAIClient(model=model, system_prompt=system_prompt)
     elif model.friendly_name == "echo":
-        return _echo.EchoClient(system_prompt=system_prompt)
+        return echo.EchoClient(system_prompt=system_prompt)
     elif model.friendly_name == "broken":
-        return _broken.BrokenClient(system_prompt=system_prompt)
+        return broken.BrokenClient(system_prompt=system_prompt)
     raise ModelNotConfigured(model=model)
 
 

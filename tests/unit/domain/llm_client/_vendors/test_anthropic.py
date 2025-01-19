@@ -1,7 +1,7 @@
 import pytest
 import pytest_httpx
 
-from llm_cli.domain.llm_client import _anthropic
+from llm_cli.domain.llm_client._vendors import anthropic
 
 
 class TestGetResponseAsync:
@@ -9,7 +9,7 @@ class TestGetResponseAsync:
     async def test_parses_and_returns_response_when_configured_correctly(
         self, httpx_mock: pytest_httpx.HTTPXMock
     ):
-        client = _anthropic.AnthropicClient(api_key="fake-key", system_prompt="fake")
+        client = anthropic.AnthropicClient(api_key="fake-key", system_prompt="fake")
 
         httpx_mock.add_response(
             url="https://api.anthropic.com/v1/messages",
@@ -28,7 +28,7 @@ class TestGetResponseAsync:
     async def test_raises_when_fails_to_authenticate(
         self, httpx_mock: pytest_httpx.HTTPXMock
     ):
-        client = _anthropic.AnthropicClient(api_key="fake-key", system_prompt="fake")
+        client = anthropic.AnthropicClient(api_key="fake-key", system_prompt="fake")
 
         httpx_mock.add_response(
             url="https://api.anthropic.com/v1/messages",
@@ -38,7 +38,7 @@ class TestGetResponseAsync:
             is_reusable=True,
         )
 
-        with pytest.raises(_anthropic.AnthropicAPIError) as exc:
+        with pytest.raises(anthropic.AnthropicAPIError) as exc:
             async for _ in client.stream_response(
                 user_prompt="Tell me about your constitution."
             ):
