@@ -3,8 +3,8 @@ import sys
 
 import pytest
 
+from llm_cli import clients
 from llm_cli.commands import question
-from llm_cli.domain import llm_client
 
 
 @pytest.mark.asyncio
@@ -13,7 +13,7 @@ async def test_asks_question_to_echo_model_and_gets_response():
     sys.stdout = output
 
     arguments = question.QuestionCommandArgs(
-        question="What is your speciality?", model=llm_client.ECHO, persona="Eva Perón"
+        question="What is your speciality?", model=clients.ECHO, persona="Eva Perón"
     )
 
     await question.ask_question(arguments=arguments)
@@ -28,7 +28,7 @@ async def test_handles_error_raised_while_streaming_response_from_client():
     sys.stdout = output
 
     arguments = question.QuestionCommandArgs(
-        question="What is your speciality?", model=llm_client.BROKEN, persona=None
+        question="What is your speciality?", model=clients.BROKEN, persona=None
     )
 
     await question.ask_question(arguments=arguments)

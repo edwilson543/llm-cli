@@ -1,4 +1,4 @@
-from llm_cli.domain.llm_client import _models
+from llm_cli.clients import _models
 
 from . import anthropic
 

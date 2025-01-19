@@ -1,7 +1,7 @@
 import re
 from typing import AsyncGenerator
 
-from llm_cli.domain.llm_client import _base
+from llm_cli.clients import _base
 
 
 class EchoClient(_base.LLMClient):

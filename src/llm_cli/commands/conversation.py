@@ -2,7 +2,7 @@ import argparse
 import asyncio
 import sys
 
-from llm_cli.domain import llm_client
+from llm_cli import clients
 
 from ._utils import parsing as parsing_utils
 from ._utils import printing as printing_utils
@@ -55,7 +55,7 @@ async def start_conversation(
                 await printing_utils.print_response_stream_to_terminal(
                     client.stream_response(user_prompt=user_prompt)
                 )
-            except llm_client.LLMClientError as exc:
+            except clients.LLMClientError as exc:
                 print("Error streaming response.", exc, end="")
                 break
 

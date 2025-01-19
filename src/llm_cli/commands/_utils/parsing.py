@@ -1,7 +1,7 @@
 import argparse
 import dataclasses
 
-from llm_cli.domain import llm_client
+from llm_cli import clients
 
 
 @dataclasses.dataclass(frozen=True)
@@ -11,7 +11,7 @@ class CommandArgs:
     """
 
     persona: str | None
-    model: llm_client.Model
+    model: clients.Model
 
     @property
     def system_prompt(self) -> str:
@@ -30,8 +30,8 @@ def add_model_argument(parser: argparse.ArgumentParser) -> None:
         "-m",
         "--model",
         type=str,
-        choices=[model.friendly_name for model in llm_client.get_available_models()],
-        default=llm_client.get_default_model().friendly_name,
+        choices=[model.friendly_name for model in clients.get_available_models()],
+        default=clients.get_default_model().friendly_name,
         help="The model that should be used.",
     )
 
@@ -46,8 +46,8 @@ def add_persona_argument(parser: argparse.ArgumentParser) -> None:
     )
 
 
-def get_model_from_friendly_name(friendly_name: str) -> llm_client.Model:
-    for model in llm_client.get_available_models():
+def get_model_from_friendly_name(friendly_name: str) -> clients.Model:
+    for model in clients.get_available_models():
         if model.friendly_name == friendly_name:
             return model
 

@@ -3,7 +3,7 @@ from collections.abc import AsyncGenerator
 
 import anthropic
 
-from llm_cli.domain.llm_client import _base, _models
+from llm_cli.clients import _base, _models
 
 
 @dataclasses.dataclass(frozen=True)

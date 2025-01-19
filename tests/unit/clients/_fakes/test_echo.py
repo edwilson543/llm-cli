@@ -1,6 +1,6 @@
 import pytest
 
-from llm_cli.domain.llm_client._fakes import echo
+from llm_cli.clients._fakes import echo
 
 
 class TestGetResponseAsync:

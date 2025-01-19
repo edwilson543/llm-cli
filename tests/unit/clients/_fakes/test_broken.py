@@ -1,7 +1,7 @@
 import pytest
 
-from llm_cli.domain.llm_client import _base
-from llm_cli.domain.llm_client._fakes import broken
+from llm_cli.clients import _base
+from llm_cli.clients._fakes import broken
 
 
 class TestGetResponseAsync:

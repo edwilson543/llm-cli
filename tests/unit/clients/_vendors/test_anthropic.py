@@ -1,7 +1,7 @@
 import pytest
 import pytest_httpx
 
-from llm_cli.domain.llm_client._vendors import anthropic
+from llm_cli.clients._vendors import anthropic
 
 
 class TestGetResponseAsync:

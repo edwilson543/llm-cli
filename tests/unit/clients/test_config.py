@@ -3,9 +3,9 @@ from unittest import mock
 import pytest
 
 from llm_cli import env
-from llm_cli.domain.llm_client import _config, _models
-from llm_cli.domain.llm_client._fakes import broken, echo
-from llm_cli.domain.llm_client._vendors import anthropic, xai
+from llm_cli.clients import _config, _models
+from llm_cli.clients._fakes import broken, echo
+from llm_cli.clients._vendors import anthropic, xai
 
 
 class TestGetLLMClient:
