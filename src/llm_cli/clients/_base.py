@@ -66,10 +66,10 @@ class LLMClient(abc.ABC):
     def _get_api_key(self, api_key: str | None = None) -> str:
         if api_key:
             return api_key
-        if not api_key and self._api_key_env_var:
-            try:
-                return env.as_str(self._api_key_env_var)
-            except env.EnvironmentVariableNotSet as exc:
-                raise APIKeyNotSet(env_var=self._api_key_env_var) from exc
+        elif not self._api_key_env_var:
+            raise APIKeyNotSet(env_var="UNKNOWN")
 
-        raise APIKeyNotSet(env_var="UNKNOWN")
+        try:
+            return env.as_str(self._api_key_env_var)
+        except env.EnvironmentVariableNotSet as exc:
+            raise APIKeyNotSet(env_var=self._api_key_env_var) from exc
