@@ -27,6 +27,7 @@ async def test_has_brief_conversation_with_echo_model_then_exits(mock_input: moc
     await conversation.start_conversation(arguments=arguments)
 
     stdout = output.getvalue()
+    assert "echo (Paul Erdős)" in stdout
     assert "How many sides does a circle have?" in stdout
     assert "What do you mean 'How do I define what a side is'???" in stdout
     assert "Goodbye!" in stdout

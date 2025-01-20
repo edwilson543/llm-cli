@@ -39,9 +39,10 @@ async def _ask_question(*, arguments: QuestionCommandArgs) -> None:
     if not client:
         return
 
-    with printing_utils.print_block_from_interlocutor(
-        interlocutor=arguments.interlocutor
-    ):
+    interlocutor = printing_utils.get_interlocutor_display_name(
+        model=arguments.model, persona=arguments.persona
+    )
+    with printing_utils.print_block_from_interlocutor(interlocutor=interlocutor):
         try:
             await printing_utils.print_response_stream_to_terminal(
                 client.stream_response(user_prompt=arguments.question)

@@ -12,7 +12,11 @@ EXIT = "exit"
 
 
 class ConversationCommandArgs(parsing_utils.CommandArgs):
-    pass
+    @property
+    def interlocutor(self) -> str:
+        return printing_utils.get_interlocutor_display_name(
+            model=self.model, persona=self.persona
+        )
 
 
 def main():

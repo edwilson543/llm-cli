@@ -76,6 +76,15 @@ async def print_response_stream_to_terminal(
             is_first_line = False
 
 
+def get_interlocutor_display_name(
+    *, model: clients.Model, persona: str | None = None
+) -> str:
+    interlocutor = model.friendly_name
+    if persona:
+        interlocutor += f" ({persona})"
+    return interlocutor
+
+
 def set_print_colour_to_green() -> None:
     cyan = "\033[92m"
     print(cyan, end="")
