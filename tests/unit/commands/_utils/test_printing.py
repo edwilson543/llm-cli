@@ -5,8 +5,8 @@ from unittest import mock
 
 import pytest
 
-from llm_cli.commands._utils import parsing, printing
-from llm_cli.domain import llm_client
+from llm_cli import clients
+from llm_cli.commands._utils import printing
 
 
 class TestGetLLMClientOrPrintError:
@@ -14,25 +14,25 @@ class TestGetLLMClientOrPrintError:
         output = io.StringIO()
         sys.stdout = output
 
-        arguments = parsing.CommandArgs(model=llm_client.ECHO, persona=None)
-
-        client = printing.get_llm_client_or_print_error(arguments=arguments)
+        client = printing.get_llm_client_or_print_error(
+            model=clients.ECHO, system_prompt=""
+        )
 
         assert client is not None
         assert output.getvalue() == ""
 
     @mock.patch.object(
-        llm_client,
+        clients,
         "get_llm_client",
-        side_effect=llm_client.APIKeyNotSet(env_var="XAI_API_KEY"),
+        side_effect=clients.APIKeyNotSet(env_var="XAI_API_KEY"),
     )
     def test_print_error_when_model_not_available(self, mock_get_client: mock.Mock):
         output = io.StringIO()
         sys.stdout = output
 
-        arguments = parsing.CommandArgs(model=llm_client.GROK_2, persona=None)
-
-        client = printing.get_llm_client_or_print_error(arguments=arguments)
+        client = printing.get_llm_client_or_print_error(
+            model=clients.GROK_2, system_prompt=""
+        )
 
         assert client is None
         expected_output = (

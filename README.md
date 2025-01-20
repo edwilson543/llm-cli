@@ -37,8 +37,9 @@ pipx install -e .
 ```
 
 ## Supported models:
-- Claude {Haiku, Sonnet, Opus}
-- Grok 2
+- Anthropic: Claude {Haiku, Sonnet, Opus}
+- Mistral: Codestral, Mistral, Ministral
+- xAI: Grok 2
 - More soon
 
 ## Usage:
@@ -46,16 +47,15 @@ pipx install -e .
 ```bash
 >>> question --help
 
-usage: question [-h] [-p PERSONA] [-m {claude-haiku,claude-sonnet,claude-opus,grok-2,echo,broken}] [-s] question
+usage: q [-h] [-m [{claude-haiku,claude-sonnet,claude-opus,codestral,mistral,ministral,grok-2,echo,broken} ...]] [-p PERSONA] question
 
 positional arguments:
   question              The question the model should answer.
 
 options:
   -h, --help            show this help message and exit
+  -m --model [{claude-haiku,claude-sonnet,claude-opus,codestral,mistral,ministral,grok-2,echo,broken} ...]
+                        The model that should be used. Multiple models can be specified, separated by a space.
   -p PERSONA, --persona PERSONA
                         The persona the model should assume.
-  -m {claude-haiku,claude-sonnet,claude-opus,grok-2,echo,broken}, --model {claude-haiku,claude-sonnet,claude-opus,grok-2,echo,broken}
-                        The model that should be used.
-  -s, --stream          Whether to stream the response from the model asynchronously.
 ```

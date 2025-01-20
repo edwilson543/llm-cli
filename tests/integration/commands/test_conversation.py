@@ -4,8 +4,8 @@ from unittest import mock
 
 import pytest
 
+from llm_cli import clients
 from llm_cli.commands import conversation
-from llm_cli.domain import llm_client
 
 
 @pytest.mark.asyncio
@@ -21,12 +21,13 @@ async def test_has_brief_conversation_with_echo_model_then_exits(mock_input: moc
     ]
 
     arguments = conversation.ConversationCommandArgs(
-        model=llm_client.ECHO, persona="Paul Erdős"
+        model=clients.ECHO, persona="Paul Erdős"
     )
 
     await conversation.start_conversation(arguments=arguments)
 
     stdout = output.getvalue()
+    assert "echo (Paul Erdős)" in stdout
     assert "How many sides does a circle have?" in stdout
     assert "What do you mean 'How do I define what a side is'???" in stdout
     assert "Goodbye!" in stdout
@@ -40,9 +41,7 @@ async def test_handles_error_raised_while_streaming_response_from_client(
     output = io.StringIO()
     sys.stdout = output
 
-    arguments = conversation.ConversationCommandArgs(
-        model=llm_client.BROKEN, persona=None
-    )
+    arguments = conversation.ConversationCommandArgs(model=clients.BROKEN, persona=None)
 
     await conversation.start_conversation(arguments=arguments)
 

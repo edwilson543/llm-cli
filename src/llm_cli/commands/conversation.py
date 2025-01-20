@@ -1,8 +1,9 @@
 import argparse
 import asyncio
+import dataclasses
 import sys
 
-from llm_cli.domain import llm_client
+from llm_cli import clients
 
 from ._utils import parsing as parsing_utils
 from ._utils import printing as printing_utils
@@ -11,8 +12,23 @@ from ._utils import printing as printing_utils
 EXIT = "exit"
 
 
-class ConversationCommandArgs(parsing_utils.CommandArgs):
-    pass
+@dataclasses.dataclass(frozen=True)
+class ConversationCommandArgs:
+    model: clients.Model
+    persona: str | None
+
+    @property
+    def system_prompt(self) -> str:
+        prompt = "Please be as succinct as possible in your answer."
+        if self.persona:
+            prompt += f" Please assume the persona of {self.persona}."
+        return prompt
+
+    @property
+    def interlocutor(self) -> str:
+        return printing_utils.get_interlocutor_display_name(
+            model=self.model, persona=self.persona
+        )
 
 
 def main():
@@ -30,7 +46,9 @@ async def start_conversation(
     if arguments is None:
         arguments = _extract_args_from_cli(sys.argv[1:])
 
-    client = printing_utils.get_llm_client_or_print_error(arguments=arguments)
+    client = printing_utils.get_llm_client_or_print_error(
+        model=arguments.model, system_prompt=arguments.system_prompt
+    )
     if not client:
         return
 
@@ -55,7 +73,7 @@ async def start_conversation(
                 await printing_utils.print_response_stream_to_terminal(
                     client.stream_response(user_prompt=user_prompt)
                 )
-            except llm_client.LLMClientError as exc:
+            except clients.LLMClientError as exc:
                 print("Error streaming response.", exc, end="")
                 break
 
@@ -63,7 +81,14 @@ async def start_conversation(
 def _extract_args_from_cli(args: list[str]) -> ConversationCommandArgs:
     parser = argparse.ArgumentParser()
 
-    parsing_utils.add_model_argument(parser)
+    parser.add_argument(
+        "-m",
+        "--model",
+        type=str,
+        choices=[model.friendly_name for model in clients.get_available_models()],
+        default=clients.get_default_model().friendly_name,
+        help="The model that should be used.",
+    )
     parsing_utils.add_persona_argument(parser)
 
     parsed_args = parser.parse_args(args)

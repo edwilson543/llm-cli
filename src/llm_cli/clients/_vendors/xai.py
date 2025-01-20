@@ -1,7 +1,9 @@
-from . import _anthropic, _models
+from llm_cli.clients import _models
+
+from . import anthropic
 
 
-class XAIClient(_anthropic.AnthropicClient):
+class XAIClient(anthropic.AnthropicClient):
     """
     The xAI API is compatible with the Anthropic SDK, hence the Anthropic client is subclaseed.
     https://docs.x.ai/docs/overview#migrating-from-another-llm-provider

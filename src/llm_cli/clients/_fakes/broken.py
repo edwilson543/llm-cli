@@ -1,6 +1,6 @@
 from typing import AsyncGenerator
 
-from llm_cli.domain.llm_client import _base
+from llm_cli.clients import _base
 
 
 class BrokenClientError(_base.LLMClientError):

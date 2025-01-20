@@ -2,25 +2,21 @@ import contextlib
 import re
 import typing
 
-from llm_cli.domain import llm_client
-
-from . import parsing
+from llm_cli import clients
 
 
 MAX_LINE_WIDTH = 80
 
 
 def get_llm_client_or_print_error(
-    *, arguments: parsing.CommandArgs
-) -> llm_client.LLMClient | None:
+    *, model: clients.Model, system_prompt: str
+) -> clients.LLMClient | None:
     try:
-        return llm_client.get_llm_client(
-            model=arguments.model, system_prompt=arguments.system_prompt
-        )
-    except llm_client.APIKeyNotSet as exc:
+        return clients.get_llm_client(model=model, system_prompt=system_prompt)
+    except clients.APIKeyNotSet as exc:
         set_print_colour_to_yellow()
         print(
-            f"The {exc.env_var} environment variable must be set to use {arguments.model.vendor.value}'s models!"
+            f"The {exc.env_var} environment variable must be set to use {model.vendor.value}'s models!"
         )
         return None
 
@@ -76,9 +72,19 @@ async def print_response_stream_to_terminal(
             is_first_line = False
 
 
+def get_interlocutor_display_name(
+    *, model: clients.Model, persona: str | None = None
+) -> str:
+    interlocutor = model.friendly_name
+    if persona:
+        interlocutor += f" ({persona})"
+    return interlocutor
+
+
 def set_print_colour_to_green() -> None:
     cyan = "\033[92m"
     print(cyan, end="")
+
 
 def set_print_colour_to_cyan() -> None:
     cyan = "\033[96m"
