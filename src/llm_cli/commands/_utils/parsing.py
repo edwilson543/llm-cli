@@ -22,7 +22,10 @@ class CommandArgs:
 
     @property
     def interlocutor(self) -> str:
-        return self.persona or self.model.friendly_name
+        interlocutor = self.model.friendly_name
+        if self.persona:
+            interlocutor += f" ({self.persona})"
+        return interlocutor
 
 
 def add_model_argument(parser: argparse.ArgumentParser) -> None:
