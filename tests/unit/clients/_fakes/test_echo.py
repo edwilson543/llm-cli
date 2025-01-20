@@ -3,7 +3,7 @@ import pytest
 from llm_cli.clients._fakes import echo
 
 
-class TestGetResponseAsync:
+class TestStreamResponse:
     @pytest.mark.asyncio
     async def test_returns_user_prompt(self):
         client = echo.EchoClient()

@@ -4,7 +4,7 @@ import pytest_httpx
 from llm_cli.clients._vendors import anthropic
 
 
-class TestGetResponseAsync:
+class TestStreamResponse:
     @pytest.mark.asyncio
     async def test_parses_and_returns_response_when_configured_correctly(
         self, httpx_mock: pytest_httpx.HTTPXMock

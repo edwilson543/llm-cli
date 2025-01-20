@@ -4,7 +4,7 @@ from llm_cli.clients import _base
 from llm_cli.clients._fakes import broken
 
 
-class TestGetResponseAsync:
+class TestStreamResponse:
     @pytest.mark.asyncio
     async def test_raises_whenever_called(self):
         client = broken.BrokenClient()
