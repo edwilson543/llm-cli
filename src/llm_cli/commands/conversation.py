@@ -1,5 +1,6 @@
 import argparse
 import asyncio
+import dataclasses
 import sys
 
 from llm_cli import clients
@@ -11,7 +12,18 @@ from ._utils import printing as printing_utils
 EXIT = "exit"
 
 
-class ConversationCommandArgs(parsing_utils.CommandArgs):
+@dataclasses.dataclass(frozen=True)
+class ConversationCommandArgs:
+    model: clients.Model
+    persona: str | None
+
+    @property
+    def system_prompt(self) -> str:
+        prompt = "Please be as succinct as possible in your answer."
+        if self.persona:
+            prompt += f" Please assume the persona of {self.persona}."
+        return prompt
+
     @property
     def interlocutor(self) -> str:
         return printing_utils.get_interlocutor_display_name(
@@ -34,7 +46,9 @@ async def start_conversation(
     if arguments is None:
         arguments = _extract_args_from_cli(sys.argv[1:])
 
-    client = printing_utils.get_llm_client_or_print_error(arguments=arguments)
+    client = printing_utils.get_llm_client_or_print_error(
+        model=arguments.model, system_prompt=arguments.system_prompt
+    )
     if not client:
         return
 

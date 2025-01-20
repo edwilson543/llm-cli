@@ -10,48 +10,52 @@ from ._utils import printing as printing_utils
 
 
 @dataclasses.dataclass(frozen=True)
-class QuestionCommandArgs(parsing_utils.CommandArgs):
+class QuestionCommandArgs:
     question: str
+    models: list[clients.Model]
+    persona: str | None
+
+    @property
+    def system_prompt(self) -> str:
+        prompt = "Please be as succinct as possible in your answer."
+        if self.persona:
+            prompt += f" Please assume the persona of {self.persona}."
+        return prompt
 
 
 def main():
-    asyncio.run(ask_questions())
+    asyncio.run(ask_question())
 
 
-async def ask_questions(*, arguments: list[QuestionCommandArgs] | None = None) -> None:
+async def ask_question(*, arguments: QuestionCommandArgs | None = None) -> None:
     """
-    Command to ask a question to one or more models.
+    Command to ask a single question to one or more models.
     """
     if arguments is None:
         arguments = _extract_args_from_cli(sys.argv[1:])
 
-    for args in arguments:
-        await _ask_question(arguments=args)
+    for model in arguments.models:
+        printing_utils.set_print_colour_to_cyan()
+
+        client = printing_utils.get_llm_client_or_print_error(
+            model=model, system_prompt=arguments.system_prompt
+        )
+        if client is None:
+            continue
+
+        interlocutor = printing_utils.get_interlocutor_display_name(
+            model=model, persona=arguments.persona
+        )
+        with printing_utils.print_block_from_interlocutor(interlocutor=interlocutor):
+            try:
+                await printing_utils.print_response_stream_to_terminal(
+                    client.stream_response(user_prompt=arguments.question)
+                )
+            except clients.LLMClientError as exc:
+                print("Error streaming response.", exc, end="")
 
 
-async def _ask_question(*, arguments: QuestionCommandArgs) -> None:
-    """
-    Ask as single question to a single model.
-    """
-    printing_utils.set_print_colour_to_cyan()
-
-    client = printing_utils.get_llm_client_or_print_error(arguments=arguments)
-    if not client:
-        return
-
-    interlocutor = printing_utils.get_interlocutor_display_name(
-        model=arguments.model, persona=arguments.persona
-    )
-    with printing_utils.print_block_from_interlocutor(interlocutor=interlocutor):
-        try:
-            await printing_utils.print_response_stream_to_terminal(
-                client.stream_response(user_prompt=arguments.question)
-            )
-        except clients.LLMClientError as exc:
-            print("Error streaming response.", exc, end="")
-
-
-def _extract_args_from_cli(args: list[str]) -> list[QuestionCommandArgs]:
+def _extract_args_from_cli(args: list[str]) -> QuestionCommandArgs:
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
@@ -72,11 +76,11 @@ def _extract_args_from_cli(args: list[str]) -> list[QuestionCommandArgs]:
 
     parsed_args = parser.parse_args(args)
 
-    return [
-        QuestionCommandArgs(
-            question=parsed_args.question,
-            persona=parsed_args.persona,
-            model=parsing_utils.get_model_from_friendly_name(model),
-        )
-        for model in parsed_args.model
+    models = [
+        parsing_utils.get_model_from_friendly_name(model) for model in parsed_args.model
     ]
+    return QuestionCommandArgs(
+        question=parsed_args.question,
+        models=models,
+        persona=parsed_args.persona,
+    )

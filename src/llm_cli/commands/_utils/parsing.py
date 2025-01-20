@@ -1,24 +1,6 @@
 import argparse
-import dataclasses
 
 from llm_cli import clients
-
-
-@dataclasses.dataclass(frozen=True)
-class CommandArgs:
-    """
-    Base class for command arguments shared by all commands.
-    """
-
-    persona: str | None
-    model: clients.Model
-
-    @property
-    def system_prompt(self) -> str:
-        prompt = "Please be as succinct as possible in your answer."
-        if self.persona:
-            prompt += f" Please assume the persona of {self.persona}."
-        return prompt
 
 
 def add_persona_argument(parser: argparse.ArgumentParser) -> None:

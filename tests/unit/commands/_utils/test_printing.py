@@ -6,7 +6,7 @@ from unittest import mock
 import pytest
 
 from llm_cli import clients
-from llm_cli.commands._utils import parsing, printing
+from llm_cli.commands._utils import printing
 
 
 class TestGetLLMClientOrPrintError:
@@ -14,9 +14,9 @@ class TestGetLLMClientOrPrintError:
         output = io.StringIO()
         sys.stdout = output
 
-        arguments = parsing.CommandArgs(model=clients.ECHO, persona=None)
-
-        client = printing.get_llm_client_or_print_error(arguments=arguments)
+        client = printing.get_llm_client_or_print_error(
+            model=clients.ECHO, system_prompt=""
+        )
 
         assert client is not None
         assert output.getvalue() == ""
@@ -30,9 +30,9 @@ class TestGetLLMClientOrPrintError:
         output = io.StringIO()
         sys.stdout = output
 
-        arguments = parsing.CommandArgs(model=clients.GROK_2, persona=None)
-
-        client = printing.get_llm_client_or_print_error(arguments=arguments)
+        client = printing.get_llm_client_or_print_error(
+            model=clients.GROK_2, system_prompt=""
+        )
 
         assert client is None
         expected_output = (

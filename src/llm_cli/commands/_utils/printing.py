@@ -4,23 +4,19 @@ import typing
 
 from llm_cli import clients
 
-from . import parsing
-
 
 MAX_LINE_WIDTH = 80
 
 
 def get_llm_client_or_print_error(
-    *, arguments: parsing.CommandArgs
+    *, model: clients.Model, system_prompt: str
 ) -> clients.LLMClient | None:
     try:
-        return clients.get_llm_client(
-            model=arguments.model, system_prompt=arguments.system_prompt
-        )
+        return clients.get_llm_client(model=model, system_prompt=system_prompt)
     except clients.APIKeyNotSet as exc:
         set_print_colour_to_yellow()
         print(
-            f"The {exc.env_var} environment variable must be set to use {arguments.model.vendor.value}'s models!"
+            f"The {exc.env_var} environment variable must be set to use {model.vendor.value}'s models!"
         )
         return None
 
