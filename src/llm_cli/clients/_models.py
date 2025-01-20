@@ -6,6 +6,7 @@ import enum
 
 class Vendor(enum.Enum):
     ANTHROPIC = "ANTHROPIC"
+    MISTRAL = "MISTRAL"
     XAI = "XAI"
     FAKE_AI = "FAKE_AI"
 
@@ -32,6 +33,21 @@ CLAUDE_OPUS = Model(
     vendor=Vendor.ANTHROPIC,
     friendly_name="claude-opus",
     official_name="claude-3-opus-latest",
+)
+
+# Mistral.
+CODESTRAL = Model(
+    vendor=Vendor.MISTRAL, friendly_name="codestral", official_name="codestral-latest"
+)
+MISTRAL = Model(
+    vendor=Vendor.MISTRAL,
+    friendly_name="mistral",
+    official_name="mistral-large-latest",
+)
+MINISTRAL = Model(
+    vendor=Vendor.MISTRAL,
+    friendly_name="ministral",
+    official_name="ministral-3b-latest",
 )
 
 # xAI.

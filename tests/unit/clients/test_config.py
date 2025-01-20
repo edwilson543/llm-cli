@@ -5,22 +5,37 @@ import pytest
 from llm_cli import env
 from llm_cli.clients import _config, _models
 from llm_cli.clients._fakes import broken, echo
-from llm_cli.clients._vendors import anthropic, xai
+from llm_cli.clients._vendors import anthropic, mistral, xai
 
 
 class TestGetLLMClient:
+    @pytest.mark.parametrize(
+        "model", [_models.CLAUDE_HAIKU, _models.CLAUDE_SONNET, _models.CLAUDE_OPUS]
+    )
     @mock.patch.object(_config.env, "as_str", return_value="something")
-    def test_gets_anthropic_client_for_claude_sonnet_model(
-        self, mock_env_vars: mock.Mock
+    def test_gets_anthropic_client_for_anthropic_models(
+        self, mock_env_vars: mock.Mock, model: _models.Model
     ):
-        claude_sonnet = _models.CLAUDE_SONNET
-
-        client = _config.get_llm_client(model=claude_sonnet, system_prompt="fake")
+        client = _config.get_llm_client(model=model, system_prompt="fake")
 
         assert isinstance(client, anthropic.AnthropicClient)
-        assert client._model == claude_sonnet.official_name
+        assert client._model == model.official_name
         assert client._system_prompt == "fake"
         mock_env_vars.assert_called_once_with("ANTHROPIC_API_KEY")
+
+    @pytest.mark.parametrize(
+        "model", [_models.CODESTRAL, _models.MISTRAL, _models.MINISTRAL]
+    )
+    @mock.patch.object(_config.env, "as_str", return_value="something")
+    def test_gets_mistral_client_mistral_models(
+        self, mock_env_vars: mock.Mock, model: _models.Model
+    ):
+        client = _config.get_llm_client(model=model, system_prompt="fake")
+
+        assert isinstance(client, mistral.MistralClient)
+        assert client._model == model.official_name
+        assert client._system_prompt == "fake"
+        mock_env_vars.assert_called_once_with("MISTRAL_API_KEY")
 
     @mock.patch.object(_config.env, "as_str", return_value="something")
     def test_gets_xai_client_for_grok_2_model(self, mock_env_vars: mock.Mock):
