@@ -28,17 +28,6 @@ class CommandArgs:
         return interlocutor
 
 
-def add_model_argument(parser: argparse.ArgumentParser) -> None:
-    parser.add_argument(
-        "-m",
-        "--model",
-        type=str,
-        choices=[model.friendly_name for model in clients.get_available_models()],
-        default=clients.get_default_model().friendly_name,
-        help="The model that should be used.",
-    )
-
-
 def add_persona_argument(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "-p",
