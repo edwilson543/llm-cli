@@ -29,7 +29,7 @@ class AnthropicClient(_base.LLMClient):
 
         api_key = self._get_api_key(api_key=api_key)
 
-        self._async_client = anthropic.AsyncClient(api_key=api_key, base_url=base_url)
+        self._client = anthropic.AsyncClient(api_key=api_key, base_url=base_url)
         self._model = (
             model.official_name if model else _models.CLAUDE_SONNET.official_name
         )
@@ -37,7 +37,7 @@ class AnthropicClient(_base.LLMClient):
 
     async def _stream_response(self) -> AsyncGenerator[str, None]:
         try:
-            async with self._async_client.messages.stream(
+            async with self._client.messages.stream(
                 model=self._model,
                 max_tokens=self._max_tokens,
                 system=self._system_prompt,
