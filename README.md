@@ -1,12 +1,12 @@
 # Vendor agnostic LLM CLI
 
 ## Features:
-- Ask a range of LLMs a question via the command line and stream the response
-- Have the LLM assume a custom persona, for example Gandalf
+- CLI commands to:
+  - Ask a single question to one or more LLM and stream the response
+  - Have a multi-turn conversation
+- Have the model assume a custom persona, for example Gandalf
 
 https://github.com/user-attachments/assets/b56e9b90-0f71-4f92-85dc-caa7b971020a
-
-- Have a conversation with a range of LLMs, again, optionally with a custom persona
 
 https://github.com/user-attachments/assets/5ccd327b-bb7f-4b6d-9fa6-0a5936c00627
 
