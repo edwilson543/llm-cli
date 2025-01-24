@@ -43,7 +43,8 @@ pipx install -e .
 - More soon
 
 ## Usage:
-#### Question:
+
+### Question:
 ```bash
 >>> question --help
 
@@ -54,8 +55,27 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
-  -m --model [{claude-haiku,claude-sonnet,claude-opus,codestral,mistral,ministral,grok-2,echo,broken} ...]
-                        The model that should be used. Multiple models can be specified, separated by a space.
+  -m [ ...], --model [ ...]
+                        The model that should be used. Multiple models can be specified, separated by a space. The supported models are: 
+                            - claude-haiku, claude-sonnet, claude-opus
+                            - codestral, mistral, ministral
+                            - grok-2
+  -p PERSONA, --persona PERSONA
+                        The persona the model should assume.
+```
+
+### Conversation
+```bash
+>>> conversation --help
+
+usage: conversation [-h] [-m] [-p PERSONA]
+
+options:
+  -h, --help            show this help message and exit
+  -m , --model          The model that should be used. The supported models are: 
+                            - claude-haiku, claude-sonnet, claude-opus
+                            - codestral, mistral, ministral
+                            - grok-2
   -p PERSONA, --persona PERSONA
                         The persona the model should assume.
 ```
