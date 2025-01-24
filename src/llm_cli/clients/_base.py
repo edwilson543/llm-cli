@@ -19,8 +19,11 @@ class APIKeyNotSet(LLMClientError):
         return f"The '{self.env_var}' environment variable is not set."
 
 
+Role = typing.Literal["system"] | typing.Literal["user"] | typing.Literal["assistant"]
+
+
 class Message(typing.TypedDict):
-    role: typing.Literal["user"] | typing.Literal["assistant"]
+    role: Role
     content: str
 
 
