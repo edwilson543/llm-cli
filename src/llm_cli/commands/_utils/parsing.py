@@ -6,6 +6,7 @@ from llm_cli import clients
 MODEL_CHOICES_HELP = """The supported models are: 
     - claude-haiku, claude-sonnet, claude-opus
     - codestral, mistral, ministral
+    - gpt, gpt-mini
     - grok-2"""
 
 

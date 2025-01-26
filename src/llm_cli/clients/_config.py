@@ -4,7 +4,7 @@ from llm_cli import env
 
 from . import _base, _models
 from ._fakes import broken, echo
-from ._vendors import anthropic, mistral, xai
+from ._vendors import anthropic, mistral, openai, xai
 
 
 @dataclasses.dataclass(frozen=True)
@@ -23,6 +23,8 @@ def get_llm_client(*, model: _models.Model, system_prompt: str) -> _base.LLMClie
         return anthropic.AnthropicClient(model=model, system_prompt=system_prompt)
     elif model.vendor == _models.Vendor.MISTRAL:
         return mistral.MistralClient(model=model, system_prompt=system_prompt)
+    elif model.vendor == _models.Vendor.OPENAI:
+        return openai.OpenAIClient(model=model, system_prompt=system_prompt)
     elif model.vendor == _models.Vendor.XAI:
         return xai.XAIClient(model=model, system_prompt=system_prompt)
     elif model.friendly_name == "echo":
@@ -42,6 +44,9 @@ def get_available_models() -> list[_models.Model]:
         _models.CODESTRAL,
         _models.MISTRAL,
         _models.MINISTRAL,
+        # OpenAI.
+        _models.GPT_4,
+        _models.GPT_4_MINI,
         # xAI.
         _models.GROK_2,
         # Fakes.

@@ -7,6 +7,7 @@ import enum
 class Vendor(enum.Enum):
     ANTHROPIC = "ANTHROPIC"
     MISTRAL = "MISTRAL"
+    OPENAI = "OPENAI"
     XAI = "XAI"
     FAKE_AI = "FAKE_AI"
 
@@ -48,6 +49,18 @@ MINISTRAL = Model(
     vendor=Vendor.MISTRAL,
     friendly_name="ministral",
     official_name="ministral-3b-latest",
+)
+
+# OpenAI.
+GPT_4 = Model(
+    vendor=Vendor.OPENAI,
+    friendly_name="gpt",
+    official_name="gpt-4o",
+)
+GPT_4_MINI = Model(
+    vendor=Vendor.OPENAI,
+    friendly_name="gpt-mini",
+    official_name="gpt-4o-mini",
 )
 
 # xAI.
