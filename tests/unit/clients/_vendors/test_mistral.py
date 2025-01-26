@@ -1,7 +1,7 @@
 import pytest
 import pytest_httpx
 
-from llm_cli.clients import _models
+from llm_cli.clients import _base, _models
 from llm_cli.clients._vendors import mistral
 
 
@@ -43,17 +43,15 @@ class TestStreamResponse:
             is_reusable=True,
         )
 
-        with pytest.raises(mistral.MistralAPIError) as exc:
+        with pytest.raises(_base.VendorAPIError) as exc:
             async for _ in client.stream_response(user_prompt="Error?"):
                 pass
 
+        assert exc.value.vendor == _models.Vendor.MISTRAL
         assert exc.value.status_code == 401
 
     @staticmethod
     def _stream_response_ok() -> pytest_httpx.IteratorStream:
-        """
-        The Anthropic message stream API response schema, per:  https://docs.anthropic.com/en/api/messages-streaming#basic-streaming-request.
-        """
         return pytest_httpx.IteratorStream(
             [
                 b'id: 1\nevent: data\ndata: {"id": "msg_1nZdL29xx5MUA1yADyHTEsnR8uuvGzszyY", "type": "data", "model": "mistral-latest", "choices": [{"index": 0, "finish_reason": "sufficient", "delta": {"content": "Sa"}}]}\n\n',

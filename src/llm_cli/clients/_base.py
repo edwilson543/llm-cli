@@ -5,10 +5,21 @@ from collections.abc import AsyncGenerator
 
 from llm_cli import env
 
+from . import _models
+
 
 @dataclasses.dataclass(frozen=True)
 class LLMClientError(Exception):
     pass
+
+
+@dataclasses.dataclass(frozen=True)
+class VendorAPIError(LLMClientError):
+    vendor: _models.Vendor
+    status_code: int = -1
+
+    def __str__(self) -> str:
+        return f"The {self.vendor.value} API responded with status code: {self.status_code}."
 
 
 @dataclasses.dataclass(frozen=True)
@@ -19,13 +30,16 @@ class APIKeyNotSet(LLMClientError):
         return f"The '{self.env_var}' environment variable is not set."
 
 
+Role = typing.Literal["system"] | typing.Literal["user"] | typing.Literal["assistant"]
+
+
 class Message(typing.TypedDict):
-    role: typing.Literal["user"] | typing.Literal["assistant"]
+    role: Role
     content: str
 
 
 class LLMClient(abc.ABC):
-    _api_key_env_var: str | None = None
+    vendor: _models.Vendor
 
     def __init__(self, *, system_prompt: str) -> None:
         self._system_prompt = system_prompt
@@ -62,6 +76,10 @@ class LLMClient(abc.ABC):
 
     def _append_assistant_message(self, message: str) -> None:
         self._messages.append({"role": "assistant", "content": message})
+
+    @property
+    def _api_key_env_var(self) -> str:
+        return f"{self.vendor.value}_API_KEY"
 
     def _get_api_key(self, api_key: str | None = None) -> str:
         if api_key:

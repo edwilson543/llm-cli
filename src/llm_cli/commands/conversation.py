@@ -79,15 +79,16 @@ async def start_conversation(
 
 
 def _extract_args_from_cli(args: list[str]) -> ConversationCommandArgs:
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
 
     parser.add_argument(
         "-m",
         "--model",
         type=str,
-        choices=[model.friendly_name for model in clients.get_available_models()],
+        choices=parsing_utils.get_model_choices(),
         default=clients.get_default_model().friendly_name,
-        help="The model that should be used.",
+        help=f"The model that should be used. {parsing_utils.MODEL_CHOICES_HELP}",
+        metavar="",
     )
     parsing_utils.add_persona_argument(parser)
 

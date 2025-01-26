@@ -38,12 +38,15 @@ pipx install -e .
 
 ## Supported models:
 - Anthropic: Claude {Haiku, Sonnet, Opus}
+- Meta: Llama 3
 - Mistral: Codestral, Mistral, Ministral
+- OpenAI: GPT 4, GPT 4 mini
 - xAI: Grok 2
 - More soon
 
 ## Usage:
-#### Question:
+
+### Question:
 ```bash
 >>> question --help
 
@@ -54,8 +57,31 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
-  -m --model [{claude-haiku,claude-sonnet,claude-opus,codestral,mistral,ministral,grok-2,echo,broken} ...]
-                        The model that should be used. Multiple models can be specified, separated by a space.
+  -m [ ...], --model [ ...]
+                        The model that should be used. Multiple models can be specified, separated by a space. The supported models are: 
+                            - claude-haiku, claude-sonnet, claude-opus
+                            - llama-3
+                            - codestral, mistral, ministral
+                            - gpt-4, gpt-4-mini
+                            - grok-2
+  -p PERSONA, --persona PERSONA
+                        The persona the model should assume.
+```
+
+### Conversation
+```bash
+>>> conversation --help
+
+usage: conversation [-h] [-m] [-p PERSONA]
+
+options:
+  -h, --help            show this help message and exit
+  -m , --model          The model that should be used. The supported models are: 
+                            - claude-haiku, claude-sonnet, claude-opus
+                            - llama-3
+                            - codestral, mistral, ministral
+                            - gpt-4, gpt-4-mini
+                            - grok-2
   -p PERSONA, --persona PERSONA
                         The persona the model should assume.
 ```

@@ -4,11 +4,11 @@ from llm_cli import env
 
 from . import _base, _models
 from ._fakes import broken, echo
-from ._vendors import anthropic, mistral, xai
+from ._vendors import anthropic, meta, mistral, openai, xai
 
 
 @dataclasses.dataclass(frozen=True)
-class ModelNotConfigured(_base.LLMClientError):
+class ModelNotConfigured(Exception):
     model: _models.Model
 
     def __str__(self) -> str:
@@ -21,8 +21,12 @@ def get_llm_client(*, model: _models.Model, system_prompt: str) -> _base.LLMClie
     """
     if model.vendor == _models.Vendor.ANTHROPIC:
         return anthropic.AnthropicClient(model=model, system_prompt=system_prompt)
+    elif model.vendor == _models.Vendor.META:
+        return meta.MetaClient(model=model, system_prompt=system_prompt)
     elif model.vendor == _models.Vendor.MISTRAL:
         return mistral.MistralClient(model=model, system_prompt=system_prompt)
+    elif model.vendor == _models.Vendor.OPENAI:
+        return openai.OpenAIClient(model=model, system_prompt=system_prompt)
     elif model.vendor == _models.Vendor.XAI:
         return xai.XAIClient(model=model, system_prompt=system_prompt)
     elif model.friendly_name == "echo":
@@ -38,10 +42,15 @@ def get_available_models() -> list[_models.Model]:
         _models.CLAUDE_HAIKU,
         _models.CLAUDE_SONNET,
         _models.CLAUDE_OPUS,
+        # Meta.
+        _models.LLAMA_3,
         # Mistral.
         _models.CODESTRAL,
         _models.MISTRAL,
         _models.MINISTRAL,
+        # OpenAI.
+        _models.GPT_4,
+        _models.GPT_4_MINI,
         # xAI.
         _models.GROK_2,
         # Fakes.

@@ -1,12 +1,12 @@
 from collections.abc import AsyncGenerator
 
-import mistralai
+import openai
 
 from llm_cli.clients import _base, _models
 
 
-class MistralClient(_base.LLMClient):
-    vendor = _models.Vendor.MISTRAL
+class OpenAIClient(_base.LLMClient):
+    vendor = _models.Vendor.OPENAI
 
     def __init__(
         self,
@@ -14,12 +14,13 @@ class MistralClient(_base.LLMClient):
         system_prompt: str,
         model: _models.Model,
         api_key: str | None = None,
+        base_url: str | None = None,
     ) -> None:
         super().__init__(system_prompt=system_prompt)
 
         api_key = self._get_api_key(api_key=api_key)
 
-        self._client = mistralai.Mistral(api_key=api_key)
+        self._client = openai.AsyncOpenAI(api_key=api_key, base_url=base_url)
         self._model = model
         self._max_tokens = 1024
 
@@ -29,17 +30,14 @@ class MistralClient(_base.LLMClient):
 
     async def _stream_response(self) -> AsyncGenerator[str, None]:
         try:
-            response = await self._client.chat.stream_async(
-                model=self._model.official_name,
+            stream = await self._client.chat.completions.create(
                 messages=self._messages,
+                model=self._model.official_name,
                 max_tokens=self._max_tokens,
+                stream=True,
             )
-        except mistralai.SDKError as exc:
+        except openai.APIStatusError as exc:
             raise _base.VendorAPIError(status_code=exc.status_code, vendor=self.vendor)
 
-        if not response:
-            raise _base.VendorAPIError(vendor=self.vendor)
-
-        async for chunk in response:
-            if (text := chunk.data.choices[0].delta.content) is not None:
-                yield text
+        async for chunk in stream:
+            yield chunk.choices[0].delta.content or ""

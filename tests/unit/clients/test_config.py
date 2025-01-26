@@ -5,7 +5,7 @@ import pytest
 from llm_cli import env
 from llm_cli.clients import _config, _models
 from llm_cli.clients._fakes import broken, echo
-from llm_cli.clients._vendors import anthropic, mistral, xai
+from llm_cli.clients._vendors import anthropic, meta, mistral, openai, xai
 
 
 class TestGetLLMClient:
@@ -19,23 +19,46 @@ class TestGetLLMClient:
         client = _config.get_llm_client(model=model, system_prompt="fake")
 
         assert isinstance(client, anthropic.AnthropicClient)
-        assert client._model == model.official_name
+        assert client._model == model
         assert client._system_prompt == "fake"
         mock_env_vars.assert_called_once_with("ANTHROPIC_API_KEY")
+
+    @mock.patch.object(_config.env, "as_str", return_value="something")
+    def test_gets_meta_client_for_llama_3_model(self, mock_env_vars: mock.Mock):
+        llama_3 = _models.LLAMA_3
+
+        client = _config.get_llm_client(model=llama_3, system_prompt="fake")
+
+        assert isinstance(client, meta.MetaClient)
+        assert client._model == llama_3
+        assert client._messages == [{"role": "system", "content": "fake"}]
+        mock_env_vars.assert_called_once_with("META_API_KEY")
 
     @pytest.mark.parametrize(
         "model", [_models.CODESTRAL, _models.MISTRAL, _models.MINISTRAL]
     )
     @mock.patch.object(_config.env, "as_str", return_value="something")
-    def test_gets_mistral_client_mistral_models(
+    def test_gets_mistral_client_for_mistral_models(
         self, mock_env_vars: mock.Mock, model: _models.Model
     ):
         client = _config.get_llm_client(model=model, system_prompt="fake")
 
         assert isinstance(client, mistral.MistralClient)
-        assert client._model == model.official_name
-        assert client._system_prompt == "fake"
+        assert client._model == model
+        assert client._messages == [{"role": "system", "content": "fake"}]
         mock_env_vars.assert_called_once_with("MISTRAL_API_KEY")
+
+    @pytest.mark.parametrize("model", [_models.GPT_4, _models.GPT_4_MINI])
+    @mock.patch.object(_config.env, "as_str", return_value="something")
+    def test_gets_openai_client_for_openai_models(
+        self, mock_env_vars: mock.Mock, model: _models.Model
+    ):
+        client = _config.get_llm_client(model=model, system_prompt="fake")
+
+        assert isinstance(client, openai.OpenAIClient)
+        assert client._model == model
+        assert client._system_prompt == "fake"
+        mock_env_vars.assert_called_once_with("OPENAI_API_KEY")
 
     @mock.patch.object(_config.env, "as_str", return_value="something")
     def test_gets_xai_client_for_grok_2_model(self, mock_env_vars: mock.Mock):
@@ -44,7 +67,7 @@ class TestGetLLMClient:
         client = _config.get_llm_client(model=grok_2, system_prompt="fake")
 
         assert isinstance(client, xai.XAIClient)
-        assert client._model == grok_2.official_name
+        assert client._model == grok_2
         assert client._system_prompt == "fake"
         mock_env_vars.assert_called_once_with("XAI_API_KEY")
 
