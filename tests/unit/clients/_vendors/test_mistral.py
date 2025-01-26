@@ -51,9 +51,6 @@ class TestStreamResponse:
 
     @staticmethod
     def _stream_response_ok() -> pytest_httpx.IteratorStream:
-        """
-        The Anthropic message stream API response schema, per:  https://docs.anthropic.com/en/api/messages-streaming#basic-streaming-request.
-        """
         return pytest_httpx.IteratorStream(
             [
                 b'id: 1\nevent: data\ndata: {"id": "msg_1nZdL29xx5MUA1yADyHTEsnR8uuvGzszyY", "type": "data", "model": "mistral-latest", "choices": [{"index": 0, "finish_reason": "sufficient", "delta": {"content": "Sa"}}]}\n\n',
