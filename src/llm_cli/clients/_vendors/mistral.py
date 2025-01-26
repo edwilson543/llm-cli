@@ -1,17 +1,8 @@
-import dataclasses
 from collections.abc import AsyncGenerator
 
 import mistralai
 
 from llm_cli.clients import _base, _models
-
-
-@dataclasses.dataclass(frozen=True)
-class MistralAPIError(_base.LLMClientError):
-    status_code: int
-
-    def __str__(self) -> str:
-        return f"The API responded with status code: {self.status_code}."
 
 
 class MistralClient(_base.LLMClient):
@@ -44,10 +35,10 @@ class MistralClient(_base.LLMClient):
                 max_tokens=self._max_tokens,
             )
         except mistralai.SDKError as exc:
-            raise MistralAPIError(status_code=exc.status_code)
+            raise _base.VendorAPIError(status_code=exc.status_code, vendor=self.vendor)
 
         if not response:
-            raise MistralAPIError(status_code=503)
+            raise _base.VendorAPIError(vendor=self.vendor)
 
         async for chunk in response:
             if (text := chunk.data.choices[0].delta.content) is not None:

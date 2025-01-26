@@ -1,17 +1,8 @@
-import dataclasses
 from collections.abc import AsyncGenerator
 
 import anthropic
 
 from llm_cli.clients import _base, _models
-
-
-@dataclasses.dataclass(frozen=True)
-class AnthropicAPIError(_base.LLMClientError):
-    status_code: int
-
-    def __str__(self) -> str:
-        return f"The API responded with status code: {self.status_code}."
 
 
 class AnthropicClient(_base.LLMClient):
@@ -46,4 +37,4 @@ class AnthropicClient(_base.LLMClient):
                 async for text in stream.text_stream:
                     yield text
         except anthropic.APIStatusError as exc:
-            raise AnthropicAPIError(status_code=exc.status_code)
+            raise _base.VendorAPIError(status_code=exc.status_code, vendor=self.vendor)

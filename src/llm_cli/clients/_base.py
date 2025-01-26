@@ -14,6 +14,15 @@ class LLMClientError(Exception):
 
 
 @dataclasses.dataclass(frozen=True)
+class VendorAPIError(LLMClientError):
+    vendor: _models.Vendor
+    status_code: int = -1
+
+    def __str__(self) -> str:
+        return f"The {self.vendor.value} API responded with status code: {self.status_code}."
+
+
+@dataclasses.dataclass(frozen=True)
 class APIKeyNotSet(LLMClientError):
     env_var: str
 

@@ -1,17 +1,8 @@
-import dataclasses
 from collections.abc import AsyncGenerator
 
 import openai
 
 from llm_cli.clients import _base, _models
-
-
-@dataclasses.dataclass(frozen=True)
-class OpenAIAPIError(_base.LLMClientError):
-    status_code: int
-
-    def __str__(self) -> str:
-        return f"The API responded with status code: {self.status_code}."
 
 
 class OpenAIClient(_base.LLMClient):
@@ -46,7 +37,7 @@ class OpenAIClient(_base.LLMClient):
                 stream=True,
             )
         except openai.APIStatusError as exc:
-            raise OpenAIAPIError(status_code=exc.status_code)
+            raise _base.VendorAPIError(status_code=exc.status_code, vendor=self.vendor)
 
         async for chunk in stream:
             yield chunk.choices[0].delta.content or ""

@@ -1,7 +1,7 @@
 import pytest
 import pytest_httpx
 
-from llm_cli.clients import _models
+from llm_cli.clients import _base, _models
 from llm_cli.clients._vendors import mistral
 
 
@@ -43,10 +43,11 @@ class TestStreamResponse:
             is_reusable=True,
         )
 
-        with pytest.raises(mistral.MistralAPIError) as exc:
+        with pytest.raises(_base.VendorAPIError) as exc:
             async for _ in client.stream_response(user_prompt="Error?"):
                 pass
 
+        assert exc.value.vendor == _models.Vendor.MISTRAL
         assert exc.value.status_code == 401
 
     @staticmethod

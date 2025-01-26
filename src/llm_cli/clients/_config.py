@@ -8,7 +8,7 @@ from ._vendors import anthropic, meta, mistral, openai, xai
 
 
 @dataclasses.dataclass(frozen=True)
-class ModelNotConfigured(_base.LLMClientError):
+class ModelNotConfigured(Exception):
     model: _models.Model
 
     def __str__(self) -> str:

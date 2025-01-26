@@ -46,5 +46,6 @@ async def test_handles_error_raised_while_streaming_response_from_client(
     await conversation.start_conversation(arguments=arguments)
 
     assert (
-        "Error streaming response. Fake AI is permanently broken." in output.getvalue()
+        "Error streaming response. The FAKE_AI API responded with status code: 503."
+        in output.getvalue()
     )

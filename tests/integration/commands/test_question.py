@@ -52,5 +52,5 @@ async def test_handles_error_raised_while_streaming_response_from_client():
 
     await question.ask_question(arguments=arguments)
 
-    expected_output = "\033[96m\nbroken: \n---\nError streaming response. Fake AI is permanently broken.\n---\n\n"
+    expected_output = "\033[96m\nbroken: \n---\nError streaming response. The FAKE_AI API responded with status code: 503.\n---\n\n"
     assert output.getvalue() == expected_output
