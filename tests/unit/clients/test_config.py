@@ -5,7 +5,7 @@ import pytest
 from llm_cli import env
 from llm_cli.clients import _config, _models
 from llm_cli.clients._fakes import broken, echo
-from llm_cli.clients._vendors import anthropic, mistral, openai, xai
+from llm_cli.clients._vendors import anthropic, meta, mistral, openai, xai
 
 
 class TestGetLLMClient:
@@ -23,6 +23,17 @@ class TestGetLLMClient:
         assert client._system_prompt == "fake"
         mock_env_vars.assert_called_once_with("ANTHROPIC_API_KEY")
 
+    @mock.patch.object(_config.env, "as_str", return_value="something")
+    def test_gets_meta_client_for_llama_3_model(self, mock_env_vars: mock.Mock):
+        llama_3 = _models.LLAMA_3
+
+        client = _config.get_llm_client(model=llama_3, system_prompt="fake")
+
+        assert isinstance(client, meta.MetaClient)
+        assert client._model == llama_3
+        assert client._messages == [{"role": "system", "content": "fake"}]
+        mock_env_vars.assert_called_once_with("META_API_KEY")
+
     @pytest.mark.parametrize(
         "model", [_models.CODESTRAL, _models.MISTRAL, _models.MINISTRAL]
     )
@@ -33,8 +44,8 @@ class TestGetLLMClient:
         client = _config.get_llm_client(model=model, system_prompt="fake")
 
         assert isinstance(client, mistral.MistralClient)
-        assert client._model == model.official_name
-        assert client._system_prompt == "fake"
+        assert client._model == model
+        assert client._messages == [{"role": "system", "content": "fake"}]
         mock_env_vars.assert_called_once_with("MISTRAL_API_KEY")
 
     @pytest.mark.parametrize("model", [_models.GPT_4, _models.GPT_4_MINI])

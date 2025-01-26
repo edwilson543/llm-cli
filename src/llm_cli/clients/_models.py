@@ -6,6 +6,7 @@ import enum
 
 class Vendor(enum.Enum):
     ANTHROPIC = "ANTHROPIC"
+    META = "META"
     MISTRAL = "MISTRAL"
     OPENAI = "OPENAI"
     XAI = "XAI"
@@ -36,6 +37,13 @@ CLAUDE_OPUS = Model(
     official_name="claude-3-opus-latest",
 )
 
+# Meta.
+LLAMA_3 = Model(
+    vendor=Vendor.META,
+    friendly_name="llama-3",
+    official_name="llama3.3-70b",
+)
+
 # Mistral.
 CODESTRAL = Model(
     vendor=Vendor.MISTRAL, friendly_name="codestral", official_name="codestral-latest"
@@ -54,12 +62,12 @@ MINISTRAL = Model(
 # OpenAI.
 GPT_4 = Model(
     vendor=Vendor.OPENAI,
-    friendly_name="gpt",
+    friendly_name="gpt-4",
     official_name="gpt-4o",
 )
 GPT_4_MINI = Model(
     vendor=Vendor.OPENAI,
-    friendly_name="gpt-mini",
+    friendly_name="gpt-4-mini",
     official_name="gpt-4o-mini",
 )
 
