@@ -5,6 +5,8 @@ from collections.abc import AsyncGenerator
 
 from llm_cli import env
 
+from . import _models
+
 
 @dataclasses.dataclass(frozen=True)
 class LLMClientError(Exception):
@@ -28,7 +30,7 @@ class Message(typing.TypedDict):
 
 
 class LLMClient(abc.ABC):
-    _api_key_env_var: str | None = None
+    vendor: _models.Vendor
 
     def __init__(self, *, system_prompt: str) -> None:
         self._system_prompt = system_prompt
@@ -65,6 +67,10 @@ class LLMClient(abc.ABC):
 
     def _append_assistant_message(self, message: str) -> None:
         self._messages.append({"role": "assistant", "content": message})
+
+    @property
+    def _api_key_env_var(self) -> str:
+        return f"{self.vendor.value}_API_KEY"
 
     def _get_api_key(self, api_key: str | None = None) -> str:
         if api_key:

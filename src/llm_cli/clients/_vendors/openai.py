@@ -15,7 +15,7 @@ class OpenAIAPIError(_base.LLMClientError):
 
 
 class OpenAIClient(_base.LLMClient):
-    _api_key_env_var = "OPENAI_API_KEY"
+    vendor = _models.Vendor.OPENAI
 
     def __init__(
         self,

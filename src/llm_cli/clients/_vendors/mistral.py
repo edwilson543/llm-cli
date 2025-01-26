@@ -15,7 +15,7 @@ class MistralAPIError(_base.LLMClientError):
 
 
 class MistralClient(_base.LLMClient):
-    _api_key_env_var = "MISTRAL_API_KEY"
+    vendor = _models.Vendor.MISTRAL
 
     def __init__(
         self,

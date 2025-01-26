@@ -15,7 +15,7 @@ class AnthropicAPIError(_base.LLMClientError):
 
 
 class AnthropicClient(_base.LLMClient):
-    _api_key_env_var = "ANTHROPIC_API_KEY"
+    vendor = _models.Vendor.ANTHROPIC
 
     def __init__(
         self,

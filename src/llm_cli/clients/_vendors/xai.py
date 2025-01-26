@@ -5,11 +5,11 @@ from . import anthropic
 
 class XAIClient(anthropic.AnthropicClient):
     """
-    The xAI API is compatible with the Anthropic SDK, hence the Anthropic client is subclaseed.
+    The xAI API is compatible with the Anthropic SDK, hence the Anthropic client is subclassed.
     https://docs.x.ai/docs/overview#migrating-from-another-llm-provider
     """
 
-    _api_key_env_var = "XAI_API_KEY"
+    vendor = _models.Vendor.XAI
 
     def __init__(
         self,
