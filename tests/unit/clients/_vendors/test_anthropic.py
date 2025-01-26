@@ -10,7 +10,9 @@ class TestStreamResponse:
     async def test_parses_and_returns_response_when_configured_correctly(
         self, httpx_mock: pytest_httpx.HTTPXMock
     ):
-        client = anthropic.AnthropicClient(api_key="fake-key", system_prompt="fake")
+        client = anthropic.AnthropicClient(
+            api_key="fake-key", system_prompt="fake", model=_models.CLAUDE_SONNET
+        )
 
         httpx_mock.add_response(
             url="https://api.anthropic.com/v1/messages",
@@ -29,7 +31,9 @@ class TestStreamResponse:
     async def test_raises_when_fails_to_authenticate(
         self, httpx_mock: pytest_httpx.HTTPXMock
     ):
-        client = anthropic.AnthropicClient(api_key="fake-key", system_prompt="fake")
+        client = anthropic.AnthropicClient(
+            api_key="fake-key", system_prompt="fake", model=_models.CLAUDE_SONNET
+        )
 
         httpx_mock.add_response(
             url="https://api.anthropic.com/v1/messages",

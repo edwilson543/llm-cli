@@ -14,8 +14,8 @@ class XAIClient(anthropic.AnthropicClient):
     def __init__(
         self,
         system_prompt: str,
+        model: _models.Model,
         api_key: str | None = None,
-        model: _models.Model | None = None,
     ) -> None:
         super().__init__(
             system_prompt=system_prompt,

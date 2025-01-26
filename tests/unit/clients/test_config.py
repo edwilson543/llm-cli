@@ -19,7 +19,7 @@ class TestGetLLMClient:
         client = _config.get_llm_client(model=model, system_prompt="fake")
 
         assert isinstance(client, anthropic.AnthropicClient)
-        assert client._model == model.official_name
+        assert client._model == model
         assert client._system_prompt == "fake"
         mock_env_vars.assert_called_once_with("ANTHROPIC_API_KEY")
 
@@ -67,7 +67,7 @@ class TestGetLLMClient:
         client = _config.get_llm_client(model=grok_2, system_prompt="fake")
 
         assert isinstance(client, xai.XAIClient)
-        assert client._model == grok_2.official_name
+        assert client._model == grok_2
         assert client._system_prompt == "fake"
         mock_env_vars.assert_called_once_with("XAI_API_KEY")
 

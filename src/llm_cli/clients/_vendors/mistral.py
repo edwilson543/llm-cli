@@ -20,7 +20,7 @@ class MistralClient(_base.LLMClient):
         api_key = self._get_api_key(api_key=api_key)
 
         self._client = mistralai.Mistral(api_key=api_key)
-        self._model = model.official_name
+        self._model = model
         self._max_tokens = 1024
 
         # Add the system prompt to `messages`, since this can't be specified separately.
@@ -30,7 +30,7 @@ class MistralClient(_base.LLMClient):
     async def _stream_response(self) -> AsyncGenerator[str, None]:
         try:
             response = await self._client.chat.stream_async(
-                model=self._model,
+                model=self._model.official_name,
                 messages=self._messages,
                 max_tokens=self._max_tokens,
             )
