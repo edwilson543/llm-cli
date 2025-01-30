@@ -11,8 +11,8 @@ class EchoClient(_base.LLMClient):
 
     vendor = _models.Vendor.FAKE_AI
 
-    def __init__(self, system_prompt: str = "Provide an echo."):
-        super().__init__(system_prompt=system_prompt)
+    def __init__(self, parameters: _base.ModelParameters):
+        super().__init__(parameters=parameters)
 
     async def _stream_response(self) -> AsyncGenerator[str, None]:
         latest_user_message = self._messages[-1]["content"]

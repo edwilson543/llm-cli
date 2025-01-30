@@ -18,6 +18,13 @@ class ConversationCommandArgs:
     persona: str | None
 
     @property
+    def model_parameters(self) -> clients.ModelParameters:
+        return clients.ModelParameters(
+            system_prompt=self.system_prompt,
+            max_tokens=1024,
+        )
+
+    @property
     def system_prompt(self) -> str:
         prompt = "Please be as succinct as possible in your answer."
         if self.persona:
@@ -47,7 +54,7 @@ async def start_conversation(
         arguments = _extract_args_from_cli(sys.argv[1:])
 
     client = printing_utils.get_llm_client_or_print_error(
-        model=arguments.model, system_prompt=arguments.system_prompt
+        model=arguments.model, parameters=arguments.model_parameters
     )
     if not client:
         return

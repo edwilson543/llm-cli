@@ -11,12 +11,12 @@ class OpenAIClient(_base.LLMClient):
     def __init__(
         self,
         *,
-        system_prompt: str,
+        parameters: _base.ModelParameters,
         model: _models.Model,
         api_key: str | None = None,
         base_url: str | None = None,
     ) -> None:
-        super().__init__(system_prompt=system_prompt)
+        super().__init__(parameters=parameters)
 
         api_key = self._get_api_key(api_key=api_key)
 
@@ -25,7 +25,7 @@ class OpenAIClient(_base.LLMClient):
         self._max_tokens = 1024
 
         # Add the system prompt to `messages`, since this can't be specified separately.
-        system_prompt_message = {"role": "system", "content": system_prompt}
+        system_prompt_message = {"role": "system", "content": parameters.system_prompt}
         self._messages.append(system_prompt_message)
 
     async def _stream_response(self) -> AsyncGenerator[str, None]:
@@ -33,7 +33,7 @@ class OpenAIClient(_base.LLMClient):
             stream = await self._client.chat.completions.create(
                 messages=self._messages,
                 model=self._model.official_name,
-                max_tokens=self._max_tokens,
+                max_tokens=self._parameters.max_tokens,
                 stream=True,
             )
         except openai.APIStatusError as exc:

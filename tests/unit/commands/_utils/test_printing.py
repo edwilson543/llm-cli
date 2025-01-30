@@ -7,6 +7,7 @@ import pytest
 
 from llm_cli import clients
 from llm_cli.commands._utils import printing
+from testing import factories
 
 
 class TestGetLLMClientOrPrintError:
@@ -15,7 +16,7 @@ class TestGetLLMClientOrPrintError:
         sys.stdout = output
 
         client = printing.get_llm_client_or_print_error(
-            model=clients.ECHO, system_prompt=""
+            model=clients.ECHO, parameters=factories.ModelParameters()
         )
 
         assert client is not None
@@ -31,7 +32,7 @@ class TestGetLLMClientOrPrintError:
         sys.stdout = output
 
         client = printing.get_llm_client_or_print_error(
-            model=clients.GROK_2, system_prompt=""
+            model=clients.GROK_2, parameters=factories.ModelParameters()
         )
 
         assert client is None

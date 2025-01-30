@@ -16,6 +16,13 @@ class QuestionCommandArgs:
     persona: str | None
 
     @property
+    def model_parameters(self) -> clients.ModelParameters:
+        return clients.ModelParameters(
+            system_prompt=self.system_prompt,
+            max_tokens=1024,
+        )
+
+    @property
     def system_prompt(self) -> str:
         prompt = "Please be as succinct as possible in your answer."
         if self.persona:
@@ -38,7 +45,7 @@ async def ask_question(*, arguments: QuestionCommandArgs | None = None) -> None:
         printing_utils.set_print_colour_to_cyan()
 
         client = printing_utils.get_llm_client_or_print_error(
-            model=model, system_prompt=arguments.system_prompt
+            model=model, parameters=arguments.model_parameters
         )
         if client is None:
             continue

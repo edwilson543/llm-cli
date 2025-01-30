@@ -38,11 +38,19 @@ class Message(typing.TypedDict):
     content: str
 
 
+@dataclasses.dataclass(frozen=True)
+class ModelParameters:
+    system_prompt: str
+    max_tokens: int
+    # temperature: float
+    # top_p: float
+
+
 class LLMClient(abc.ABC):
     vendor: _models.Vendor
 
-    def __init__(self, *, system_prompt: str) -> None:
-        self._system_prompt = system_prompt
+    def __init__(self, *, parameters: ModelParameters) -> None:
+        self._parameters = parameters
         self._messages: list[Message] = []
 
     async def stream_response(self, *, user_prompt: str) -> AsyncGenerator[str, None]:

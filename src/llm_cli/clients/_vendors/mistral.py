@@ -11,20 +11,19 @@ class MistralClient(_base.LLMClient):
     def __init__(
         self,
         *,
-        system_prompt: str,
+        parameters: _base.ModelParameters,
         model: _models.Model,
         api_key: str | None = None,
     ) -> None:
-        super().__init__(system_prompt=system_prompt)
+        super().__init__(parameters=parameters)
 
         api_key = self._get_api_key(api_key=api_key)
 
         self._client = mistralai.Mistral(api_key=api_key)
         self._model = model
-        self._max_tokens = 1024
 
         # Add the system prompt to `messages`, since this can't be specified separately.
-        system_prompt_message = {"role": "system", "content": system_prompt}
+        system_prompt_message = {"role": "system", "content": parameters.system_prompt}
         self._messages.append(system_prompt_message)
 
     async def _stream_response(self) -> AsyncGenerator[str, None]:
@@ -32,7 +31,7 @@ class MistralClient(_base.LLMClient):
             response = await self._client.chat.stream_async(
                 model=self._model.official_name,
                 messages=self._messages,
-                max_tokens=self._max_tokens,
+                max_tokens=self._parameters.max_tokens,
             )
         except mistralai.SDKError as exc:
             raise _base.VendorAPIError(status_code=exc.status_code, vendor=self.vendor)
