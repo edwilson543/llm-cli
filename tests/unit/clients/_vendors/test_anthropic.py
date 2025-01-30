@@ -3,6 +3,7 @@ import pytest_httpx
 
 from llm_cli.clients import _base, _models
 from llm_cli.clients._vendors import anthropic
+from testing import factories
 
 
 class TestStreamResponse:
@@ -11,7 +12,9 @@ class TestStreamResponse:
         self, httpx_mock: pytest_httpx.HTTPXMock
     ):
         client = anthropic.AnthropicClient(
-            api_key="fake-key", system_prompt="fake", model=_models.CLAUDE_SONNET
+            api_key="fake-key",
+            parameters=factories.ModelParameters(),
+            model=_models.CLAUDE_SONNET,
         )
 
         httpx_mock.add_response(
@@ -32,7 +35,9 @@ class TestStreamResponse:
         self, httpx_mock: pytest_httpx.HTTPXMock
     ):
         client = anthropic.AnthropicClient(
-            api_key="fake-key", system_prompt="fake", model=_models.CLAUDE_SONNET
+            api_key="fake-key",
+            parameters=factories.ModelParameters(),
+            model=_models.CLAUDE_SONNET,
         )
 
         httpx_mock.add_response(

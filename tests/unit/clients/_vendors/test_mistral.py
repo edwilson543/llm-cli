@@ -3,6 +3,7 @@ import pytest_httpx
 
 from llm_cli.clients import _base, _models
 from llm_cli.clients._vendors import mistral
+from testing import factories
 
 
 class TestStreamResponse:
@@ -11,7 +12,9 @@ class TestStreamResponse:
         self, httpx_mock: pytest_httpx.HTTPXMock
     ):
         client = mistral.MistralClient(
-            model=_models.MISTRAL, api_key="fake-key", system_prompt="fake"
+            model=_models.MISTRAL,
+            api_key="fake-key",
+            parameters=factories.ModelParameters(),
         )
 
         httpx_mock.add_response(
@@ -33,7 +36,9 @@ class TestStreamResponse:
         self, httpx_mock: pytest_httpx.HTTPXMock
     ):
         client = mistral.MistralClient(
-            model=_models.MISTRAL, api_key="fake-key", system_prompt="fake"
+            model=_models.MISTRAL,
+            api_key="fake-key",
+            parameters=factories.ModelParameters(),
         )
 
         httpx_mock.add_response(

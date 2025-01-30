@@ -7,6 +7,7 @@ import pytest
 
 from llm_cli import clients
 from llm_cli.commands._utils import printing
+from testing import factories
 
 
 class TestGetLLMClientOrPrintError:
@@ -15,7 +16,7 @@ class TestGetLLMClientOrPrintError:
         sys.stdout = output
 
         client = printing.get_llm_client_or_print_error(
-            model=clients.ECHO, system_prompt=""
+            model=clients.ECHO, parameters=factories.ModelParameters()
         )
 
         assert client is not None
@@ -26,12 +27,12 @@ class TestGetLLMClientOrPrintError:
         "get_llm_client",
         side_effect=clients.APIKeyNotSet(env_var="XAI_API_KEY"),
     )
-    def test_print_error_when_model_not_available(self, mock_get_client: mock.Mock):
+    def test_prints_error_when_model_not_available(self, mock_get_client: mock.Mock):
         output = io.StringIO()
         sys.stdout = output
 
         client = printing.get_llm_client_or_print_error(
-            model=clients.GROK_2, system_prompt=""
+            model=clients.GROK_2, parameters=factories.ModelParameters()
         )
 
         assert client is None

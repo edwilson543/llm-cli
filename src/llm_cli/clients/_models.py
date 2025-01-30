@@ -6,6 +6,7 @@ import enum
 
 class Vendor(enum.Enum):
     ANTHROPIC = "ANTHROPIC"
+    DEEPSEEK = "DEEPSEEK"
     META = "META"
     MISTRAL = "MISTRAL"
     OPENAI = "OPENAI"
@@ -35,6 +36,18 @@ CLAUDE_OPUS = Model(
     vendor=Vendor.ANTHROPIC,
     friendly_name="claude-opus",
     official_name="claude-3-opus-latest",
+)
+
+# Deepseek.
+DEEPSEEK_V3_CHAT = Model(
+    vendor=Vendor.DEEPSEEK,
+    friendly_name="deepseek-chat",
+    official_name="deepseek-chat",
+)
+DEEPSEEK_R1_REASONING = Model(
+    vendor=Vendor.DEEPSEEK,
+    friendly_name="deepseek-reasoner",
+    official_name="deepseek-reasoner",
 )
 
 # Meta.

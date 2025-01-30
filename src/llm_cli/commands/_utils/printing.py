@@ -9,10 +9,10 @@ MAX_LINE_WIDTH = 80
 
 
 def get_llm_client_or_print_error(
-    *, model: clients.Model, system_prompt: str
+    *, model: clients.Model, parameters: clients.ModelParameters
 ) -> clients.LLMClient | None:
     try:
-        return clients.get_llm_client(model=model, system_prompt=system_prompt)
+        return clients.get_llm_client(model=model, parameters=parameters)
     except clients.APIKeyNotSet as exc:
         set_print_colour_to_yellow()
         print(

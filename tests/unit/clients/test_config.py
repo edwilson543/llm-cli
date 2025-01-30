@@ -5,7 +5,8 @@ import pytest
 from llm_cli import env
 from llm_cli.clients import _config, _models
 from llm_cli.clients._fakes import broken, echo
-from llm_cli.clients._vendors import anthropic, meta, mistral, openai, xai
+from llm_cli.clients._vendors import anthropic, deepseek, meta, mistral, openai, xai
+from testing import factories
 
 
 class TestGetLLMClient:
@@ -16,21 +17,39 @@ class TestGetLLMClient:
     def test_gets_anthropic_client_for_anthropic_models(
         self, mock_env_vars: mock.Mock, model: _models.Model
     ):
-        client = _config.get_llm_client(model=model, system_prompt="fake")
+        parameters = factories.ModelParameters()
+        client = _config.get_llm_client(model=model, parameters=parameters)
 
         assert isinstance(client, anthropic.AnthropicClient)
         assert client._model == model
-        assert client._system_prompt == "fake"
+        assert client._parameters == parameters
         mock_env_vars.assert_called_once_with("ANTHROPIC_API_KEY")
+
+    @pytest.mark.parametrize(
+        "model", [_models.DEEPSEEK_V3_CHAT, _models.DEEPSEEK_R1_REASONING]
+    )
+    @mock.patch.object(_config.env, "as_str", return_value="something")
+    def test_gets_deepseek_client_for_deep_seek_models(
+        self, mock_env_vars: mock.Mock, model: _models.Model
+    ):
+        parameters = factories.ModelParameters()
+        client = _config.get_llm_client(model=model, parameters=parameters)
+
+        assert isinstance(client, deepseek.DeepSeekClient)
+        assert client._model == model
+        assert client._parameters == parameters
+        assert client._messages == [{"role": "system", "content": "fake"}]
+        mock_env_vars.assert_called_once_with("DEEPSEEK_API_KEY")
 
     @mock.patch.object(_config.env, "as_str", return_value="something")
     def test_gets_meta_client_for_llama_3_model(self, mock_env_vars: mock.Mock):
         llama_3 = _models.LLAMA_3
-
-        client = _config.get_llm_client(model=llama_3, system_prompt="fake")
+        parameters = factories.ModelParameters()
+        client = _config.get_llm_client(model=llama_3, parameters=parameters)
 
         assert isinstance(client, meta.MetaClient)
         assert client._model == llama_3
+        assert client._parameters == parameters
         assert client._messages == [{"role": "system", "content": "fake"}]
         mock_env_vars.assert_called_once_with("META_API_KEY")
 
@@ -41,10 +60,12 @@ class TestGetLLMClient:
     def test_gets_mistral_client_for_mistral_models(
         self, mock_env_vars: mock.Mock, model: _models.Model
     ):
-        client = _config.get_llm_client(model=model, system_prompt="fake")
+        parameters = factories.ModelParameters()
+        client = _config.get_llm_client(model=model, parameters=parameters)
 
         assert isinstance(client, mistral.MistralClient)
         assert client._model == model
+        assert client._parameters == parameters
         assert client._messages == [{"role": "system", "content": "fake"}]
         mock_env_vars.assert_called_once_with("MISTRAL_API_KEY")
 
@@ -53,35 +74,38 @@ class TestGetLLMClient:
     def test_gets_openai_client_for_openai_models(
         self, mock_env_vars: mock.Mock, model: _models.Model
     ):
-        client = _config.get_llm_client(model=model, system_prompt="fake")
+        parameters = factories.ModelParameters()
+        client = _config.get_llm_client(model=model, parameters=parameters)
 
         assert isinstance(client, openai.OpenAIClient)
         assert client._model == model
-        assert client._system_prompt == "fake"
+        assert client._parameters == parameters
         mock_env_vars.assert_called_once_with("OPENAI_API_KEY")
 
     @mock.patch.object(_config.env, "as_str", return_value="something")
     def test_gets_xai_client_for_grok_2_model(self, mock_env_vars: mock.Mock):
         grok_2 = _models.GROK_2
-
-        client = _config.get_llm_client(model=grok_2, system_prompt="fake")
+        parameters = factories.ModelParameters()
+        client = _config.get_llm_client(model=grok_2, parameters=parameters)
 
         assert isinstance(client, xai.XAIClient)
         assert client._model == grok_2
-        assert client._system_prompt == "fake"
+        assert client._parameters == parameters
         mock_env_vars.assert_called_once_with("XAI_API_KEY")
 
     def test_gets_echo_client(self):
-        client = _config.get_llm_client(model=_models.ECHO, system_prompt="fake")
+        parameters = factories.ModelParameters()
+        client = _config.get_llm_client(model=_models.ECHO, parameters=parameters)
 
         assert isinstance(client, echo.EchoClient)
-        assert client._system_prompt == "fake"
+        assert client._parameters == parameters
 
     def test_gets_broken_client(self):
-        client = _config.get_llm_client(model=_models.BROKEN, system_prompt="fake")
+        parameters = factories.ModelParameters()
+        client = _config.get_llm_client(model=_models.BROKEN, parameters=parameters)
 
         assert isinstance(client, broken.BrokenClient)
-        assert client._system_prompt == "fake"
+        assert client._parameters == parameters
 
     def test_raises_when_model_not_configured(self):
         not_configured_model = _models.Model(
@@ -89,9 +113,10 @@ class TestGetLLMClient:
             friendly_name="not-configured",
             official_name="not-configured",
         )
+        parameters = factories.ModelParameters()
 
         with pytest.raises(_config.ModelNotConfigured) as exc:
-            _config.get_llm_client(model=not_configured_model, system_prompt="fake")
+            _config.get_llm_client(model=not_configured_model, parameters=parameters)
 
         assert exc.value.model == not_configured_model
         expected_exc_message = (

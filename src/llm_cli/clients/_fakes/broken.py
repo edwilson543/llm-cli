@@ -10,8 +10,8 @@ class BrokenClient(_base.LLMClient):
 
     vendor = _models.Vendor.FAKE_AI
 
-    def __init__(self, system_prompt: str = "Be broken."):
-        super().__init__(system_prompt=system_prompt)
+    def __init__(self, parameters: _base.ModelParameters):
+        super().__init__(parameters=parameters)
 
     async def _stream_response(self) -> AsyncGenerator[str, None]:
         for _ in range(0, 1):

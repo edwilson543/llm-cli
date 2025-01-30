@@ -3,8 +3,8 @@ from llm_cli.clients import _base, _models
 from . import openai
 
 
-class MetaClient(openai.OpenAIClient):
-    vendor = _models.Vendor.META
+class DeepSeekClient(openai.OpenAIClient):
+    vendor = _models.Vendor.DEEPSEEK
 
     def __init__(
         self,
@@ -18,5 +18,5 @@ class MetaClient(openai.OpenAIClient):
             parameters=parameters,
             model=model,
             api_key=api_key,
-            base_url="https://api.llama-api.com",
+            base_url="https://api.deepseek.com",
         )

@@ -14,6 +14,14 @@ class LLMClientError(Exception):
 
 
 @dataclasses.dataclass(frozen=True)
+class InvalidModelParameters(LLMClientError):
+    message: str
+
+    def __str__(self) -> str:
+        return self.message
+
+
+@dataclasses.dataclass(frozen=True)
 class VendorAPIError(LLMClientError):
     vendor: _models.Vendor
     status_code: int = -1
@@ -38,11 +46,29 @@ class Message(typing.TypedDict):
     content: str
 
 
+@dataclasses.dataclass(frozen=True)
+class ModelParameters:
+    system_prompt: str
+    max_tokens: int
+    temperature: float
+    top_p: float
+
+    def __post_init__(self) -> None:
+        if self.max_tokens <= 0:
+            raise InvalidModelParameters("Max tokens must be greater than 0.")
+        if self.temperature < 0 or self.temperature > 1:
+            # Some models e.g. GPT allow specifying a temperature of up to 2.0.
+            # A standard range is enforced purely for simplicity.
+            raise InvalidModelParameters("Temperature must be in the range [0, 1].")
+        if self.top_p < 0 or self.top_p > 1:
+            raise InvalidModelParameters("Top p must be in the range [0, 1].")
+
+
 class LLMClient(abc.ABC):
     vendor: _models.Vendor
 
-    def __init__(self, *, system_prompt: str) -> None:
-        self._system_prompt = system_prompt
+    def __init__(self, *, parameters: ModelParameters) -> None:
+        self._parameters = parameters
         self._messages: list[Message] = []
 
     async def stream_response(self, *, user_prompt: str) -> AsyncGenerator[str, None]:

@@ -6,6 +6,7 @@ import pytest
 
 from llm_cli import clients
 from llm_cli.commands import conversation
+from testing import factories
 
 
 @pytest.mark.asyncio
@@ -20,7 +21,7 @@ async def test_has_brief_conversation_with_echo_model_then_exits(mock_input: moc
         "exit",
     ]
 
-    arguments = conversation.ConversationCommandArgs(
+    arguments = factories.ConversationCommandArgs(
         model=clients.ECHO, persona="Paul Erdős"
     )
 
@@ -41,11 +42,24 @@ async def test_handles_error_raised_while_streaming_response_from_client(
     output = io.StringIO()
     sys.stdout = output
 
-    arguments = conversation.ConversationCommandArgs(model=clients.BROKEN, persona=None)
+    arguments = factories.ConversationCommandArgs(model=clients.BROKEN)
 
     await conversation.start_conversation(arguments=arguments)
 
-    assert (
+    expected_output = (
         "Error streaming response. The FAKE_AI API responded with status code: 503."
-        in output.getvalue()
     )
+    assert expected_output in output.getvalue()
+
+
+@pytest.mark.asyncio
+async def test_handles_error_raised_from_invalid_value_for_top_p():
+    output = io.StringIO()
+    sys.stdout = output
+
+    arguments = factories.ConversationCommandArgs(model=clients.ECHO, top_p=-31.5)
+
+    await conversation.start_conversation(arguments=arguments)
+
+    expected_output = "\x1b[93mTop p must be in the range [0, 1].\n"
+    assert output.getvalue() == expected_output

@@ -4,7 +4,7 @@ from llm_cli import env
 
 from . import _base, _models
 from ._fakes import broken, echo
-from ._vendors import anthropic, meta, mistral, openai, xai
+from ._vendors import anthropic, deepseek, meta, mistral, openai, xai
 
 
 @dataclasses.dataclass(frozen=True)
@@ -15,24 +15,28 @@ class ModelNotConfigured(Exception):
         return f"No LLMClient implementation is installed for model '{self.model.official_name}'."
 
 
-def get_llm_client(*, model: _models.Model, system_prompt: str) -> _base.LLMClient:
+def get_llm_client(
+    *, model: _models.Model, parameters: _base.ModelParameters
+) -> _base.LLMClient:
     """
     Return an LLMClient instance that integrates with the specified model.
     """
     if model.vendor == _models.Vendor.ANTHROPIC:
-        return anthropic.AnthropicClient(model=model, system_prompt=system_prompt)
+        return anthropic.AnthropicClient(model=model, parameters=parameters)
+    elif model.vendor == _models.Vendor.DEEPSEEK:
+        return deepseek.DeepSeekClient(model=model, parameters=parameters)
     elif model.vendor == _models.Vendor.META:
-        return meta.MetaClient(model=model, system_prompt=system_prompt)
+        return meta.MetaClient(model=model, parameters=parameters)
     elif model.vendor == _models.Vendor.MISTRAL:
-        return mistral.MistralClient(model=model, system_prompt=system_prompt)
+        return mistral.MistralClient(model=model, parameters=parameters)
     elif model.vendor == _models.Vendor.OPENAI:
-        return openai.OpenAIClient(model=model, system_prompt=system_prompt)
+        return openai.OpenAIClient(model=model, parameters=parameters)
     elif model.vendor == _models.Vendor.XAI:
-        return xai.XAIClient(model=model, system_prompt=system_prompt)
+        return xai.XAIClient(model=model, parameters=parameters)
     elif model.friendly_name == "echo":
-        return echo.EchoClient(system_prompt=system_prompt)
+        return echo.EchoClient(parameters=parameters)
     elif model.friendly_name == "broken":
-        return broken.BrokenClient(system_prompt=system_prompt)
+        return broken.BrokenClient(parameters=parameters)
     raise ModelNotConfigured(model=model)
 
 
@@ -42,6 +46,9 @@ def get_available_models() -> list[_models.Model]:
         _models.CLAUDE_HAIKU,
         _models.CLAUDE_SONNET,
         _models.CLAUDE_OPUS,
+        # Deepseek.
+        _models.DEEPSEEK_V3_CHAT,
+        _models.DEEPSEEK_R1_REASONING,
         # Meta.
         _models.LLAMA_3,
         # Mistral.
