@@ -52,8 +52,6 @@ async def start_conversation(
     """
     Command to have a multi-turn conversation with a model.
     """
-    printing_utils.set_print_colour_to_cyan()
-
     if arguments is None:
         arguments = _extract_args_from_cli(sys.argv[1:])
 
@@ -70,6 +68,13 @@ async def start_conversation(
     if not client:
         return
 
+    await _conversation_loop(client=client, arguments=arguments)
+
+
+async def _conversation_loop(
+    *, client: clients.LLMClient, arguments: ConversationCommandArgs
+) -> None:
+    printing_utils.set_print_colour_to_cyan()
     print(f"type '{EXIT}' to end conversation\n")
 
     while True:
