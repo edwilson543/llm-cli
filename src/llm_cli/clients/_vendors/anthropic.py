@@ -30,6 +30,7 @@ class AnthropicClient(_base.LLMClient):
                 max_tokens=self._parameters.max_tokens,
                 system=self._parameters.system_prompt,
                 messages=self._messages,
+                temperature=self._parameters.temperature,
             ) as stream:
                 async for text in stream.text_stream:
                     yield text

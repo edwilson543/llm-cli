@@ -11,3 +11,4 @@ class ModelParameters(clients.ModelParameters):
 
     system_prompt: str = "fake"
     max_tokens: int = 512
+    temperature: float = 1.0

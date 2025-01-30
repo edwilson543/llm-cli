@@ -32,6 +32,7 @@ class MistralClient(_base.LLMClient):
                 model=self._model.official_name,
                 messages=self._messages,
                 max_tokens=self._parameters.max_tokens,
+                temperature=self._parameters.temperature,
             )
         except mistralai.SDKError as exc:
             raise _base.VendorAPIError(status_code=exc.status_code, vendor=self.vendor)

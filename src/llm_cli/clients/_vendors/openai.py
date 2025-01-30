@@ -35,6 +35,7 @@ class OpenAIClient(_base.LLMClient):
                 model=self._model.official_name,
                 max_tokens=self._parameters.max_tokens,
                 stream=True,
+                temperature=self._parameters.temperature,
             )
         except openai.APIStatusError as exc:
             raise _base.VendorAPIError(status_code=exc.status_code, vendor=self.vendor)

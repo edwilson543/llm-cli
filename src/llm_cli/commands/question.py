@@ -20,6 +20,7 @@ class QuestionCommandArgs:
         return clients.ModelParameters(
             system_prompt=self.system_prompt,
             max_tokens=1024,
+            temperature=1.0,
         )
 
     @property
