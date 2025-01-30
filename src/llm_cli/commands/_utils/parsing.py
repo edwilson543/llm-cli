@@ -5,6 +5,7 @@ from llm_cli import clients
 
 MODEL_CHOICES_HELP = """The supported models are: 
     - claude-haiku, claude-sonnet, claude-opus
+    - deepseek-chat, deepseek-reasoner
     - llama-3
     - codestral, mistral, ministral
     - gpt-4, gpt-4-mini

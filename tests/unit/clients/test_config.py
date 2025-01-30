@@ -5,7 +5,7 @@ import pytest
 from llm_cli import env
 from llm_cli.clients import _config, _models
 from llm_cli.clients._fakes import broken, echo
-from llm_cli.clients._vendors import anthropic, meta, mistral, openai, xai
+from llm_cli.clients._vendors import anthropic, deepseek, meta, mistral, openai, xai
 
 
 class TestGetLLMClient:
@@ -22,6 +22,20 @@ class TestGetLLMClient:
         assert client._model == model
         assert client._system_prompt == "fake"
         mock_env_vars.assert_called_once_with("ANTHROPIC_API_KEY")
+
+    @pytest.mark.parametrize(
+        "model", [_models.DEEPSEEK_V3_CHAT, _models.DEEPSEEK_R1_REASONING]
+    )
+    @mock.patch.object(_config.env, "as_str", return_value="something")
+    def test_gets_deepseek_client_for_deep_seek_models(
+        self, mock_env_vars: mock.Mock, model: _models.Model
+    ):
+        client = _config.get_llm_client(model=model, system_prompt="fake")
+
+        assert isinstance(client, deepseek.DeepSeekClient)
+        assert client._model == model
+        assert client._messages == [{"role": "system", "content": "fake"}]
+        mock_env_vars.assert_called_once_with("DEEPSEEK_API_KEY")
 
     @mock.patch.object(_config.env, "as_str", return_value="something")
     def test_gets_meta_client_for_llama_3_model(self, mock_env_vars: mock.Mock):

@@ -4,7 +4,7 @@ from llm_cli import env
 
 from . import _base, _models
 from ._fakes import broken, echo
-from ._vendors import anthropic, meta, mistral, openai, xai
+from ._vendors import anthropic, deepseek, meta, mistral, openai, xai
 
 
 @dataclasses.dataclass(frozen=True)
@@ -21,6 +21,8 @@ def get_llm_client(*, model: _models.Model, system_prompt: str) -> _base.LLMClie
     """
     if model.vendor == _models.Vendor.ANTHROPIC:
         return anthropic.AnthropicClient(model=model, system_prompt=system_prompt)
+    elif model.vendor == _models.Vendor.DEEPSEEK:
+        return deepseek.DeepSeekClient(model=model, system_prompt=system_prompt)
     elif model.vendor == _models.Vendor.META:
         return meta.MetaClient(model=model, system_prompt=system_prompt)
     elif model.vendor == _models.Vendor.MISTRAL:
@@ -42,6 +44,9 @@ def get_available_models() -> list[_models.Model]:
         _models.CLAUDE_HAIKU,
         _models.CLAUDE_SONNET,
         _models.CLAUDE_OPUS,
+        # Deepseek.
+        _models.DEEPSEEK_V3_CHAT,
+        _models.DEEPSEEK_R1_REASONING,
         # Meta.
         _models.LLAMA_3,
         # Mistral.
