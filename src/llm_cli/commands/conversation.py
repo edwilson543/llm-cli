@@ -16,14 +16,16 @@ EXIT = "exit"
 class ConversationCommandArgs:
     model: clients.Model
     persona: str | None
+    temperature: float
+    top_p: float
 
     @property
     def model_parameters(self) -> clients.ModelParameters:
         return clients.ModelParameters(
             system_prompt=self.system_prompt,
             max_tokens=1024,
-            temperature=1.0,
-            top_p=1.0,
+            temperature=self.temperature,
+            top_p=self.top_p,
         )
 
     @property
@@ -55,8 +57,15 @@ async def start_conversation(
     if arguments is None:
         arguments = _extract_args_from_cli(sys.argv[1:])
 
+    try:
+        model_parameters = arguments.model_parameters
+    except clients.InvalidModelParameters as exc:
+        printing_utils.set_print_colour_to_yellow()
+        print(exc)
+        return None
+
     client = printing_utils.get_llm_client_or_print_error(
-        model=arguments.model, parameters=arguments.model_parameters
+        model=arguments.model, parameters=model_parameters
     )
     if not client:
         return
@@ -100,10 +109,14 @@ def _extract_args_from_cli(args: list[str]) -> ConversationCommandArgs:
         metavar="",
     )
     parsing_utils.add_persona_argument(parser)
+    parsing_utils.add_temperature_argument(parser)
+    parsing_utils.add_top_p_argument(parser)
 
     parsed_args = parser.parse_args(args)
 
     return ConversationCommandArgs(
         persona=parsed_args.persona,
         model=parsing_utils.get_model_from_friendly_name(parsed_args.model),
+        temperature=parsed_args.temperature,
+        top_p=parsed_args.top_p,
     )

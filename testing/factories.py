@@ -5,7 +5,7 @@ Provide defaults, to make tests more succinct.
 import dataclasses
 
 from llm_cli import clients
-from llm_cli.commands import question
+from llm_cli.commands import conversation, question
 
 
 @dataclasses.dataclass(frozen=True)
@@ -22,6 +22,14 @@ class QuestionCommandArgs(question.QuestionCommandArgs):
     models: list[clients.Model] = dataclasses.field(
         default_factory=lambda: [clients.ECHO]
     )
+    persona: str | None = None
+    temperature: float = 1.0
+    top_p: float = 1.0
+
+
+@dataclasses.dataclass(frozen=True)
+class ConversationCommandArgs(conversation.ConversationCommandArgs):
+    model: clients.Model = clients.ECHO
     persona: str | None = None
     temperature: float = 1.0
     top_p: float = 1.0
