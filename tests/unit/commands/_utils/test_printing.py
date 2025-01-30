@@ -27,7 +27,7 @@ class TestGetLLMClientOrPrintError:
         "get_llm_client",
         side_effect=clients.APIKeyNotSet(env_var="XAI_API_KEY"),
     )
-    def test_print_error_when_model_not_available(self, mock_get_client: mock.Mock):
+    def test_prints_error_when_model_not_available(self, mock_get_client: mock.Mock):
         output = io.StringIO()
         sys.stdout = output
 

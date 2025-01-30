@@ -12,6 +12,25 @@ MODEL_CHOICES_HELP = """The supported models are:
     - grok-2"""
 
 
+def add_temperature_argument(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "-t",
+        "--temperature",
+        type=float,
+        default=1.0,
+        help="The temperature parameter to supply to the model. Must be in the range [0, 1].",
+    )
+
+
+def add_top_p_argument(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--top-p",
+        type=float,
+        default=1.0,
+        help="The top p parameter to supply to the model. Must be in the range [0, 1].",
+    )
+
+
 def add_persona_argument(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "-p",
