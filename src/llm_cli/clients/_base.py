@@ -51,7 +51,7 @@ class ModelParameters:
     system_prompt: str
     max_tokens: int
     temperature: float
-    # top_p: float
+    top_p: float
 
     def __post_init__(self) -> None:
         if self.max_tokens <= 0:
@@ -60,6 +60,8 @@ class ModelParameters:
             # Some models e.g. GPT allow specifying a temperature of up to 2.0.
             # A standard range is enforced purely for simplicity.
             raise InvalidModelParameters("Temperature must be in the range [0, 1].")
+        if self.top_p < 0 or self.top_p > 1:
+            raise InvalidModelParameters("Top p must be in the range [0, 1].")
 
 
 class LLMClient(abc.ABC):
